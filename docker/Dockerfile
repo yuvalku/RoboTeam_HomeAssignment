@@ -1,0 +1,56 @@
+# Base image: ROS2 Humble full version
+FROM althack/ros2:humble-dev-2024-09-01
+
+# Set non-interactive mode for APT
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install necessary dependencies (Python 3, CANopen, ROS2 utilities)
+RUN apt-get update \
+    && apt-get -y install --no-install-recommends \
+       python3-pip \
+       lsb-release \
+       can-utils \
+       ros-humble-vision-msgs \
+       ros-humble-gazebo-ros-pkgs \
+       ros-humble-rviz2 \
+       libcairo2-dev \
+    && pip3 install --upgrade pip \
+    && pip3 install canopen numpy pyulog termcolor asyncio asyncio_glib \
+    # Clean up
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Restore interactive mode for future APT commands
+ENV DEBIAN_FRONTEND=dialog
+
+# Update packages and upgrade the base system
+RUN apt-get update && apt-get upgrade -y
+
+# Clone ros2_moveit_canopen_example and CANopenNode repositories
+ARG WORKSPACE=/workspaces/ros2_workspace
+WORKDIR ${WORKSPACE}/src
+
+# Install required dependencies for the workspace
+RUN apt-get update && rosdep update \
+    && rosdep install --from-paths ${WORKSPACE}/src --ignore-src -r -y
+
+# Build the workspace
+WORKDIR ${WORKSPACE}
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
+
+# Set environment variables for ROS2
+ENV ROS_DOMAIN_ID=1
+ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+
+# Workspace setup
+WORKDIR ${WORKSPACE}
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc \
+    && echo "source ${WORKSPACE}/install/setup.bash" >> ~/.bashrc \
+    && echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
+
+# Expose necessary volumes (persistent storage for your workspace)
+VOLUME ["/workspaces/ros2_workspace/src", "/workspaces/ros2_workspace/install"]
+
+# Default command to keep the container running
+CMD ["bash"]

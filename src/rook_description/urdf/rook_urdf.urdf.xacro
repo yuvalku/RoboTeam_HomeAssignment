@@ -1,0 +1,299 @@
+<?xml version="1.0"?>
+<robot name="rook" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <link name="base_footprint" />
+  <link name="base_link">
+    <inertial>
+      <origin
+        xyz="0 0 0.5402"
+        rpy="0 0 0" />
+      <mass value="1130" />
+      <inertia
+        ixx="553.21"
+        ixy="0"
+        ixz="3.55"
+        iyy="664.44"
+        iyz="7.5"
+        izz="215.05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/base_link.STL" />
+      </geometry>
+      <material name="solid_color">
+        <color rgba="0.75294 0.75294 0.75294 1.0" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="base_link_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <link name="RR_link">
+    <inertial>
+      <origin
+        xyz="-0.1143 0 0"
+        rpy="0 0 0" />
+      <mass value="29.15" />
+      <inertia
+        ixx="2"
+        ixy="0"
+        ixz="0"
+        iyy="1.12"
+        iyz="0"
+        izz="1.12" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/RR.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/RR.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RR_joint" type="continuous">
+    <origin
+      xyz="-0.75533 0.72 0.38"
+      rpy="0 0 3.1416" />
+    <parent link="base_link" />
+    <child link="RR_link" />
+    <axis xyz="1 0 0" />
+  </joint>
+  <link name="RM_link">
+    <inertial>
+      <origin
+        xyz="-0.1143 0 0"
+        rpy="0 0 0" />
+      <mass value="29.15" />
+      <inertia
+        ixx="2"
+        ixy="0"
+        ixz="0"
+        iyy="1.12"
+        iyz="0"
+        izz="1.12" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/RM.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/RM.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RM_joint" type="continuous">
+    <origin
+      xyz="-0.75533 0 0.38"
+      rpy="0 0 3.1416" />
+    <parent link="base_link" />
+    <child link="RM_link" />
+    <axis xyz="1 0 0" />
+    <mimic joint="RR_joint" multiplier="1" offset="0" />
+  </joint>
+  <link name="RF_link">
+    <inertial>
+      <origin
+        xyz="-0.1143 0 0"
+        rpy="0 0 0" />
+      <mass value="29.15" />
+      <inertia
+        ixx="2"
+        ixy="0"
+        ixz="0"
+        iyy="1.12"
+        iyz="0"
+        izz="1.12" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/RF.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/RF.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RF_joint" type="continuous">
+    <origin
+      xyz="-0.75533 -0.72 0.38"
+      rpy="0 0 3.1416" />
+    <parent link="base_link" />
+    <child link="RF_link" />
+    <axis xyz="1 0 0" />
+    <mimic joint="RR_joint" multiplier="1" offset="0" />
+  </joint>
+  <link name="LR_link">
+    <inertial>
+      <origin
+        xyz="0.1143 0 0"
+        rpy="0 0 0" />
+      <mass value="29.15" />
+      <inertia
+        ixx="2"
+        ixy="0"
+        ixz="0"
+        iyy="1.12"
+        iyz="0"
+        izz="1.12" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/LR.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/LR.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="LR_joint" type="continuous">
+    <origin
+      xyz="0.75533 0.72 0.38"
+      rpy="0 0 3.1416" />
+    <parent link="base_link" />
+    <child link="LR_link" />
+    <axis xyz="1 0 0" />
+  </joint>
+  <link name="LM_link">
+    <inertial>
+      <origin
+        xyz="0.1143 0 0"
+        rpy="0 0 0" />
+      <mass value="29.15" />
+      <inertia
+        ixx="2"
+        ixy="0"
+        ixz="0"
+        iyy="1.12"
+        iyz="0"
+        izz="1.12" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/LM.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/LM.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="LM_joint" type="continuous">
+    <origin
+      xyz="0.75533 0 0.38"
+      rpy="0 0 3.1416" />
+    <parent link="base_link" />
+    <child link="LM_link" />
+    <axis xyz="1 0 0" />
+    <mimic joint="LR_joint" multiplier="1" offset="0" />
+  </joint>
+  <link name="LF_link">
+    <inertial>
+      <origin
+        xyz="0.1143 0 0"
+        rpy="0 0 0" />
+      <mass value="29.15" />
+      <inertia
+        ixx="2"
+        ixy="0"
+        ixz="0"
+        iyy="1.12"
+        iyz="0"
+        izz="1.12" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/LF.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://rook_description/meshes/LF.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="LF_joint" type="continuous">
+    <origin
+      xyz="0.75533 -0.72 0.38"
+      rpy="0 0 3.1416" />
+    <parent link="base_link" />
+    <child link="LF_link" />
+    <axis xyz="1 0 0" />
+    <mimic joint="LR_joint" multiplier="1" offset="0" />
+  </joint>
+</robot>
