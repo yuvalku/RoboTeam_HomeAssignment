@@ -15,7 +15,7 @@ RUN apt-get update \
        ros-humble-rviz2 \
        libcairo2-dev \
     && pip3 install --upgrade pip \
-    && pip3 install canopen numpy pyulog termcolor asyncio asyncio_glib \
+    && pip3 install numpy pyulog termcolor asyncio asyncio_glib \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
@@ -27,7 +27,6 @@ ENV DEBIAN_FRONTEND=dialog
 # Update packages and upgrade the base system
 RUN apt-get update && apt-get upgrade -y
 
-# Clone ros2_moveit_canopen_example and CANopenNode repositories
 ARG WORKSPACE=/workspaces/ros2_workspace
 WORKDIR ${WORKSPACE}/src
 
@@ -48,9 +47,6 @@ WORKDIR ${WORKSPACE}
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc \
     && echo "source ${WORKSPACE}/install/setup.bash" >> ~/.bashrc \
     && echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
-
-# Expose necessary volumes (persistent storage for your workspace)
-VOLUME ["/workspaces/ros2_workspace/src", "/workspaces/ros2_workspace/install"]
 
 # Default command to keep the container running
 CMD ["bash"]
