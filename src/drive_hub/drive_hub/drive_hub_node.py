@@ -1,25 +1,23 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
 import numpy as np
-from interfaces.msg import mpc_input, mpc_output
+from interfaces.msg import MpcInput, MpcOutput
 
 class DriveHub(Node):
 
     def __init__(self):
-        super().__init__('twist_mux_node')
+        super().__init__('drive_hub_node')
         self.drive_cmd_sub = self.create_subscription(
             Twist, '/cmd_vel', self.cmd_vel_callback, 10)
         self.odom_sub = self.create_subscription(
-            Odometry, '/odom', self.odom_callback, 10)
-        self.mpc_sub = self.create_subscription(
-            mpc_output, 'mpc_input', self.odom_callback, 10)
+            Imu, '/imu', self.imu_callback, 10)
         self.mpc_input_cmd = self.create_publisher(
-            mpc_input, 'mpc_output', 10)
+            MpcInput, 'mpc_input', 10)
+        self.mpc_routine = self.create_timer(0.5, self.mpc_routine)
         self.mpc_cmd_vel = None
-        self.odom = None
+        self.mpc_imu = None
 
 
     def euler_from_quaternion(self, quaternion):
@@ -48,10 +46,24 @@ class DriveHub(Node):
     def cmd_vel_callback(self, msg: Twist):
         self.mpc_cmd_vel = msg
 
-    def odom_callback(self, msg: Odometry):
-        self.odom = msg
+    def imu_callback(self, msg: Imu):
+        self.mpc_imu = msg
     
     def mpc_routine(self):
-        mpc_input_msg = mpc_input()
-        self.mpc_input_cmd.publish(mpc_input_msg)
+        if self.mpc_cmd_vel is not None and self.mpc_imu is not None:
+            mpc_input_msg = MpcInput()
+            mpc_input_msg.cmd_vel = self.mpc_cmd_vel
+            mpc_input_msg.imu = self.mpc_imu
+            self.mpc_input_cmd.publish(mpc_input_msg)
+            self.get_logger().info("publishing input data to mpc: {}".format(mpc_input_msg))
 
+def main(args=None):
+    rclpy.init(args=args)
+    drive_hub = DriveHub()
+    rclpy.spin(drive_hub)
+    imu_simulator.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()

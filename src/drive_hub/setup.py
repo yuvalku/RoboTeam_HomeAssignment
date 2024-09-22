@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'twist_mux_pkg'
+package_name = 'drive_hub'
 
 setup(
     name=package_name,
@@ -20,6 +20,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            "drive_hub_node = drive_hub.drive_hub_node:main",
+            "imu_sim_node = drive_hub.imu_sim_node:main",
+            "mpc_sim_node = drive_hub.mpc_sim_node:main",
+            "data_logger = drive_hub.data_logger:main",
+            "cmd_vel_sim_node = drive_hub.cmd_vel_sim_node:main"
         ],
     },
 )
