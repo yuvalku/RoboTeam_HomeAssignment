@@ -1,6 +1,5 @@
 # Base image: ROS2 Humble full version
-FROM althack/ros2:humble-dev-2024-09-01
-
+FROM althack/ros2:humble-full
 # Set non-interactive mode for APT
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -11,7 +10,7 @@ RUN apt-get update \
        lsb-release \
        can-utils \
        ros-humble-vision-msgs \
-       ros-humble-gazebo-ros-pkgs \
+       #ros-humble-gazebo-ros-pkgs \
        ros-humble-rviz2 \
        libcairo2-dev \
     && pip3 install --upgrade pip \
