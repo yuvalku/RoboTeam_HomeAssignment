@@ -1,3 +1,8 @@
 build/
 install/
 log/
+*.pyc
+src/*/dist/
+src/*/*.egg*
+src/*/resource/
+*.cfg
