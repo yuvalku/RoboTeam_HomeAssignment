@@ -4,8 +4,9 @@
   <name>interfaces</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="user@todo.todo">user</maintainer>
-  <license>TODO: License declaration</license>
+  <author email="aviv.h@robo-team.com">Aviv Haklai</author>
+  <maintainer email="aviv.h@robo-team.com">Aviv Haklai</maintainer>
+  <license>robo-team</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

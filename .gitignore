@@ -6,3 +6,4 @@ src/*/dist/
 src/*/*.egg*
 src/*/resource/
 *.cfg
+src/*/test/
