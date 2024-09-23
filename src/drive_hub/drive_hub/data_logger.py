@@ -7,7 +7,7 @@ from geometry_msgs.msg import Twist
 class DataLogger(Node):
     def __init__(self):
         super().__init__('data_logger')
-        self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
+        self.create_subscription(Twist, 'cmd_vel_input', self.cmd_vel_callback, 10)
         self.create_subscription(Imu, '/imu', self.imu_callback, 10)
         self.create_subscription(MpcOutput, 'mpc_output', self.mpc_output_callback, 10)
 

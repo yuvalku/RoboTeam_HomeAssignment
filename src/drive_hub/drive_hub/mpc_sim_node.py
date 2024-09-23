@@ -16,7 +16,7 @@ class MPCSimulator(Node):
         output_msg.cmd_vel.linear.y *= 2
         output_msg.cmd_vel.angular.z *= 2
         self.mpc_pub.publish(output_msg)
-        self.get_logger().info('Publishing MPC output: {}'.format(output_msg))
+        #self.get_logger().info('Publishing MPC output: {}'.format(output_msg))
 
 def main(args=None):
     rclpy.init(args=args)

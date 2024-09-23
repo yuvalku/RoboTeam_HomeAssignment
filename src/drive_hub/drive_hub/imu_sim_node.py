@@ -19,7 +19,7 @@ class IMUSimulator(Node):
         imu_msg.linear_acceleration.y = random.uniform(-1, 1)
         imu_msg.linear_acceleration.z = random.uniform(-1, 1)
         self.imu_pub.publish(imu_msg)
-        self.get_logger().info('Publishing IMU data: {}'.format(imu_msg))
+        #self.get_logger().info('Publishing IMU data: {}'.format(imu_msg))
 
 def main(args=None):
     rclpy.init(args=args)
