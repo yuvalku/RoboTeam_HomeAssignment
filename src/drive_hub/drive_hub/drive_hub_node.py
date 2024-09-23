@@ -10,11 +10,15 @@ class DriveHub(Node):
     def __init__(self):
         super().__init__('drive_hub_node')
         self.drive_cmd_sub = self.create_subscription(
-            Twist, '/cmd_vel', self.cmd_vel_callback, 10)
+            Twist, 'cmd_vel_input', self.cmd_vel_callback, 10)
         self.odom_sub = self.create_subscription(
             Imu, '/imu', self.imu_callback, 10)
         self.mpc_input_cmd = self.create_publisher(
             MpcInput, 'mpc_input', 10)
+        self.steer_pub = self.create_publisher(
+            Twist, 'skid_vel_cmd', 10)
+        self.mpc_output_sub = self.create_subscription(
+            MpcOutput, 'mpc_output', self.steer_callback, 10)
         self.mpc_routine = self.create_timer(0.5, self.mpc_routine)
         self.mpc_cmd_vel = None
         self.mpc_imu = None
@@ -55,13 +59,19 @@ class DriveHub(Node):
             mpc_input_msg.cmd_vel = self.mpc_cmd_vel
             mpc_input_msg.imu = self.mpc_imu
             self.mpc_input_cmd.publish(mpc_input_msg)
-            self.get_logger().info("publishing input data to mpc: {}".format(mpc_input_msg))
+            #self.get_logger().info("publishing input data to mpc: {}".format(mpc_input_msg))
+
+    def steer_callback(self, msg: MpcOutput):
+        steer_msg = Twist()
+        steer_msg = msg.cmd_vel
+        self.steer_pub.publish(steer_msg)
+
 
 def main(args=None):
     rclpy.init(args=args)
     drive_hub = DriveHub()
     rclpy.spin(drive_hub)
-    imu_simulator.destroy_node()
+    drive_hub.destroy_node()
     rclpy.shutdown()
 
 
