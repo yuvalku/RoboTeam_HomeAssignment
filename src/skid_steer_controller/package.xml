@@ -9,7 +9,6 @@
   <license>robo-team</license>
 
   <depend>rclpy</depend>
-  <depend>diff_drive_controller</depend>
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
 

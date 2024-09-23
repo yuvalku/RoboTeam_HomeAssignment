@@ -1,0 +1,5 @@
+<settings>
+    <num_wheels>6</num_wheels> <!-- Options: 4 or 6 -->
+    <wheel_radius>0.1</wheel_radius> <!-- in meters -->
+    <wheel_separation>0.5</wheel_separation> <!-- in meters -->
+</settings>
