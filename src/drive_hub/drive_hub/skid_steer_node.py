@@ -3,6 +3,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from utilities.kinematics import DifferentailDrive, load_settings
+from interfaces.msg import WheelsVelocity
 
 class SkidSteerNode(Node):
     def __init__(self):
@@ -18,13 +19,17 @@ class SkidSteerNode(Node):
 
         self.odom_msg = Odometry()
         self.timer = self.create_timer(0.1, self.publish_odometry)
-
+        self.wheels_vel_pub = self.create_publisher(
+            WheelsVelocity, 'wheels_vel', 10)
+        
     def cmd_vel_callback(self, msg: Twist):
         linear_velocity = msg.linear.x
         angular_velocity = msg.angular.z
+        wheels_vel = WheelsVelocity()
+        wheels_vel.left_wheel_velocity, wheels_vel.right_wheel_velocity = self.dd_controller.calculate_wheels_velocities(linear_velocity, angular_velocity)
+        self.get_logger().info(f'Left Wheel Velocity: {wheels_vel.left_wheel_velocity}, Right Wheel Velocity: {wheels_vel.right_wheel_velocity}')
 
-        left_wheel_velocity, right_wheel_velocity = self.dd_controller.calculate_wheels_velocities(linear_velocity, angular_velocity)
-        self.get_logger().info(f'Left Wheel Velocity: {left_wheel_velocity}, Right Wheel Velocity: {right_wheel_velocity}')
+        self.wheels_vel_pub.publish(wheels_vel)
 
     def publish_odometry(self):
         #self.odom_pub.publish(self.odom_msg)

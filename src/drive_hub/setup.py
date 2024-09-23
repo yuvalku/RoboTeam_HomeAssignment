@@ -21,10 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             "drive_hub_node = drive_hub.drive_hub_node:main",
-            "imu_sim_node = drive_hub.imu_sim_node:main",
-            "mpc_sim_node = drive_hub.mpc_sim_node:main",
-            "data_logger = drive_hub.data_logger:main",
-            "cmd_vel_sim_node = drive_hub.cmd_vel_sim_node:main"
+            "skid_steer_node = drive_hub.skid_steer_node:main"
         ],
     },
 )

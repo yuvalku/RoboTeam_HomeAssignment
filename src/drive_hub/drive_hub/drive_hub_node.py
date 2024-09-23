@@ -23,30 +23,6 @@ class DriveHub(Node):
         self.mpc_cmd_vel = None
         self.mpc_imu = None
 
-
-    def euler_from_quaternion(self, quaternion):
-        """
-        Converts quaternion (w in last place) to euler roll, pitch, yaw.
-        quaternion = [x, y, z, w]
-        """
-        x = quaternion.x
-        y = quaternion.y
-        z = quaternion.z
-        w = quaternion.w
-
-        sinr_cosp = 2 * (w * x + y * z)
-        cosr_cosp = 1 - 2 * (x * x + y * y)
-        roll = np.arctan2(sinr_cosp, cosr_cosp)
-
-        sinp = 2 * (w * y - z * x)
-        pitch = np.arcsin(sinp)
-
-        siny_cosp = 2 * (w * z + x * y)
-        cosy_cosp = 1 - 2 * (y * y + z * z)
-        yaw = np.arctan2(siny_cosp, cosy_cosp)
-
-        return roll, pitch, yaw
-    
     def cmd_vel_callback(self, msg: Twist):
         self.mpc_cmd_vel = msg
 
@@ -73,7 +49,6 @@ def main(args=None):
     rclpy.spin(drive_hub)
     drive_hub.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == "__main__":
     main()
