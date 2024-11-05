@@ -23,7 +23,8 @@ setup(
             "imu_sim_node = tester.imu_sim_node:main",
             "mpc_sim_node = tester.mpc_sim_node:main",
             "data_logger = tester.data_logger:main",
-            "cmd_vel_sim_node = tester.cmd_vel_sim_node:main"
+            "cmd_vel_sim_node = tester.cmd_vel_sim_node:main",
+            "canbus_tester_node = tester.canbus_test:main"
         ],
     },
 )

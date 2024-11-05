@@ -1,7 +1,6 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-import random
 
 class CmdVelSimulator(Node):
     def __init__(self):
