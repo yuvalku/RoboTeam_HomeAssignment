@@ -3,14 +3,14 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu
 import numpy as np
-from interfaces.msg import MpcInput, MpcOutput
+from interfaces.msg import MpcInput, MpcOutput, WheelsVelocity, CanFrame
 
 class DriveHub(Node):
 
     def __init__(self):
         super().__init__('drive_hub_node')
         self.drive_cmd_sub = self.create_subscription(
-            Twist, 'cmd_vel_input', self.cmd_vel_callback, 10)
+            WheelsVelocity, 'cmd_vel_input', self.cmd_vel_callback, 10)
         self.odom_sub = self.create_subscription(
             Imu, '/imu', self.imu_callback, 10)
         self.mpc_input_cmd = self.create_publisher(
@@ -28,7 +28,7 @@ class DriveHub(Node):
 
     def imu_callback(self, msg: Imu):
         self.mpc_imu = msg
-    
+
     def mpc_routine(self):
         if self.mpc_cmd_vel is not None and self.mpc_imu is not None:
             mpc_input_msg = MpcInput()
@@ -38,9 +38,11 @@ class DriveHub(Node):
             #self.get_logger().info("publishing input data to mpc: {}".format(mpc_input_msg))
 
     def steer_callback(self, msg: MpcOutput):
-        steer_msg = Twist()
+        steer_msg = WheelsVelocity()
         steer_msg = msg.cmd_vel
         self.steer_pub.publish(steer_msg)
+
+    
 
 
 def main(args=None):

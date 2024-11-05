@@ -1,2 +1,4 @@
 float32 left_wheel_velocity
+int32 left_wheel_direction
 float32 right_wheel_velocity
+int32 right_wheel_direction

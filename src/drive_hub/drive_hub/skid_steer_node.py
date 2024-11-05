@@ -11,7 +11,7 @@ class SkidSteerNode(Node):
         
         self.num_wheels, self.wheel_radius, self.wheel_separation = load_settings('settings.xml')
         self.dd_controller = DifferentailDrive(self.wheel_radius, self.wheel_separation, self.num_wheels)
-
+        
         self.cmd_vel_sub = self.create_subscription(
             Twist, 'skid_vel_cmd', self.cmd_vel_callback, 10)
         #self.odom_pub = self.create_publisher(
@@ -23,13 +23,23 @@ class SkidSteerNode(Node):
             WheelsVelocity, 'wheels_vel', 10)
         
     def cmd_vel_callback(self, msg: Twist):
-        linear_velocity = msg.linear.x
-        angular_velocity = msg.angular.z
-        wheels_vel = WheelsVelocity()
-        wheels_vel.left_wheel_velocity, wheels_vel.right_wheel_velocity = self.dd_controller.calculate_wheels_velocities(linear_velocity, angular_velocity)
-        self.get_logger().info(f'Left Wheel Velocity: {wheels_vel.left_wheel_velocity}, Right Wheel Velocity: {wheels_vel.right_wheel_velocity}')
+        wheelsVelocity = WheelsVelocity()
 
-        self.wheels_vel_pub.publish(wheels_vel)
+        wheelsVelocity.left_wheel_velocity, wheelsVelocity.right_wheel_velocity = self.dd_controller.calculate_wheels_velocities(msg.cmd_vel.linear.x, msg.cmd_vel.angular.z)
+
+        wheelsVelocity.left_wheel_direction = -1 # left straight
+        wheelsVelocity.right_wheel_direction = 1 # right straight
+        if msg.cmd_vel.angular.z < 0: # steer right
+            wheelsVelocity.left_wheel_direction = -1 # left straight
+            wheelsVelocity.right_wheel_direction = -1 # right backwards
+        elif msg.cmd_vel.angular.z > 0: #steer left
+            wheelsVelocity.left_wheel_direction = 1 # left backwards
+            wheelsVelocity.right_wheel_direction = 1 # right straight
+        if msg.cmd_vel.linear.x < 0: # steer back
+            wheelsVelocity.left_wheel_direction *= -1 
+            wheelsVelocity.right_wheel_direction *= -1
+
+        self.wheels_vel_pub.publish(wheelsVelocity)
 
     def publish_odometry(self):
         #self.odom_pub.publish(self.odom_msg)

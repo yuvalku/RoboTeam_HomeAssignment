@@ -29,7 +29,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MpcOutput.msg"
   "msg/MpcInput.msg"
   "msg/WheelsVelocity.msg"
-  DEPENDENCIES geometry_msgs sensor_msgs
+  "msg/CanFrame.msg"
+  "srv/CanRequest.srv"
+  DEPENDENCIES geometry_msgs sensor_msgs std_msgs
 )
 
 ament_package()
