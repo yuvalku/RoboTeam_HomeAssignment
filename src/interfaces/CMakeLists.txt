@@ -28,7 +28,7 @@ endif()
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MpcOutput.msg"
   "msg/MpcInput.msg"
-  "msg/WheelsVelocity.msg"
+  "msg/MotorsVelocity.msg"
   "msg/CanFrame.msg"
   "srv/CanRequest.srv"
   DEPENDENCIES geometry_msgs sensor_msgs std_msgs

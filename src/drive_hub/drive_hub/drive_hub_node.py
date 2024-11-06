@@ -2,47 +2,46 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu
-import numpy as np
-from interfaces.msg import MpcInput, MpcOutput, WheelsVelocity, CanFrame
+from interfaces.msg import MpcInput, MotorsVelocity
 
 class DriveHub(Node):
-
     def __init__(self):
-        super().__init__('drive_hub_node')
-        self.drive_cmd_sub = self.create_subscription(
-            WheelsVelocity, 'cmd_vel_input', self.cmd_vel_callback, 10)
-        self.odom_sub = self.create_subscription(
-            Imu, '/imu', self.imu_callback, 10)
-        self.mpc_input_cmd = self.create_publisher(
-            MpcInput, 'mpc_input', 10)
-        self.steer_pub = self.create_publisher(
-            Twist, 'skid_vel_cmd', 10)
-        self.mpc_output_sub = self.create_subscription(
-            MpcOutput, 'mpc_output', self.steer_callback, 10)
-        self.mpc_routine = self.create_timer(0.5, self.mpc_routine)
+        super().__init__('drive_hub')
+        self.create_subscriptions()
+        self.create_publishers()
         self.mpc_cmd_vel = None
         self.mpc_imu = None
+        self.create_timer(0.5, self.run_mpc_routine)
+
+    def create_subscriptions(self):
+        self.create_subscription(Twist, 'cmd_vel_input', self.cmd_vel_callback, 10)
+        self.create_subscription(Imu, '/imu', self.imu_callback, 10)
+        self.create_subscription(Twist, 'mpc_output', self.on_mpc_output, 10)
+
+    def create_publishers(self):
+        self.mpc_input_publisher = self.create_publisher(MpcInput, 'mpc_input', 10)
+        self.steer_publisher = self.create_publisher(Twist, 'skid_vel_cmd', 10)
 
     def cmd_vel_callback(self, msg: Twist):
         self.mpc_cmd_vel = msg
+        self.get_logger().info(f'Received command velocity: {msg}')
 
     def imu_callback(self, msg: Imu):
         self.mpc_imu = msg
 
-    def mpc_routine(self):
-        if self.mpc_cmd_vel is not None and self.mpc_imu is not None:
-            mpc_input_msg = MpcInput()
-            mpc_input_msg.cmd_vel = self.mpc_cmd_vel
-            mpc_input_msg.imu = self.mpc_imu
-            self.mpc_input_cmd.publish(mpc_input_msg)
-            #self.get_logger().info("publishing input data to mpc: {}".format(mpc_input_msg))
+    def run_mpc_routine(self):
+        if self.mpc_cmd_vel and self.mpc_imu:
+            mpc_input = MpcInput()
+            mpc_input.cmd_vel = self.mpc_cmd_vel
+            mpc_input.imu = self.mpc_imu
+            self.mpc_input_publisher.publish(mpc_input)
 
-    def steer_callback(self, msg: MpcOutput):
-        steer_msg = WheelsVelocity()
-        steer_msg = msg.cmd_vel
-        self.steer_pub.publish(steer_msg)
+    def on_mpc_output(self, msg: Twist):
+        steer_msg = MotorsVelocity()
+        steer_msg = msg
+        self.steer_publisher.publish(steer_msg)
+        self.get_logger().info(f'Published steer data: {steer_msg}')
 
-    
 
 
 def main(args=None):

@@ -2,23 +2,23 @@ import xml.etree.ElementTree as ET
 import os
 import numpy as np
 
-class DifferentailDrive:
-    def __init__(self, wheel_radius, wheel_separation, num_wheels):
-        self.wheel_radius = wheel_radius
-        self.wheel_separation = wheel_separation
-        self.num_wheels = num_wheels
+class DifferentialDrive:
+    def __init__(self, motor_radius, motor_separation, num_motors):
+        self.motor_radius = motor_radius
+        self.motor_separation = motor_separation
+        self.num_motors = num_motors
 
-    def calculate_wheels_velocities(self, linear_velocity, angular_velocity):
-        if self.num_wheels == 4:
-            left_wheel_velocity = (linear_velocity - (angular_velocity * self.wheel_separation / 2)) / self.wheel_radius
-            right_wheel_velocity = (linear_velocity + (angular_velocity * self.wheel_separation / 2)) / self.wheel_radius
-            return left_wheel_velocity, right_wheel_velocity
-        elif self.num_wheels == 6:
-            left_wheel_velocity = (linear_velocity - (angular_velocity * self.wheel_separation / 3)) / self.wheel_radius
-            right_wheel_velocity = (linear_velocity + (angular_velocity * self.wheel_separation / 3)) / self.wheel_radius
-            return left_wheel_velocity, right_wheel_velocity
+    def calculate_motors_velocities(self, linear_velocity, angular_velocity):
+        if self.num_motors == 4:
+            left_motor_velocity = (linear_velocity - (angular_velocity * self.motor_separation / 2)) / self.motor_radius
+            right_motor_velocity = (linear_velocity + (angular_velocity * self.motor_separation / 2)) / self.motor_radius
+            return left_motor_velocity, right_motor_velocity
+        elif self.num_motors == 6:
+            left_motor_velocity = (linear_velocity - (angular_velocity * self.motor_separation / 3)) / self.motor_radius
+            right_motor_velocity = (linear_velocity + (angular_velocity * self.motor_separation / 3)) / self.motor_radius
+            return left_motor_velocity, right_motor_velocity
         else:
-            raise ValueError("Unsupported number of wheels: {}".format(self.num_wheels))
+            raise ValueError("Unsupported number of motors: {}".format(self.num_motors))
 
 def load_settings(filename):
     current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -28,11 +28,11 @@ def load_settings(filename):
     tree = ET.parse(settings_path)
     root = tree.getroot()
 
-    num_wheels = int(root.find('num_wheels').text)
-    wheel_radius = float(root.find('wheel_radius').text)
-    wheel_separation = float(root.find('wheel_separation').text)
+    num_motors = int(root.find('num_motors').text)
+    motor_radius = float(root.find('motor_radius').text)
+    motor_separation = float(root.find('motor_separation').text)
 
-    return num_wheels, wheel_radius, wheel_separation        
+    return num_motors, motor_radius, motor_separation        
 
 def euler_from_quaternion(self, quaternion):
         """
