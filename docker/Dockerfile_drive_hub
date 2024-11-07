@@ -15,6 +15,9 @@ RUN apt-get update \
        libcairo2-dev \
     && pip3 install --upgrade pip \
     && pip3 install numpy pyulog termcolor asyncio asyncio_glib \
+    && pip3 install python-can \
+    && pip3 install black==21.12b0 uvloop==0.17.0 \
+    && pip3 install --upgrade typing-extensions \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
