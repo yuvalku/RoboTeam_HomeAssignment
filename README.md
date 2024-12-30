@@ -65,15 +65,13 @@ cd /workspace/ROS2/scripts
 
 ### Reports
 1. **Rotation/Load Report**
-   -**Left Motor**
    ```text
-   ID: 0x303
-   Data: 0x03, <rpm> (short), <load> (short)
-   ```
-   -**Right Motor**
-   ```text
-   ID: 0x304
-   Data: 0x03, <rpm> (short), <load> (short)
+   Left Motor
+      ID: 0x303
+      Data: 0x03, <rpm> (short), <load> (short)
+   Right Motor
+      ID: 0x304
+      Data: 0x03, <rpm> (short), <load> (short)
    ```
 2. **IMU**
    ```text
