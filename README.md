@@ -42,38 +42,47 @@ cd /workspace/ROS2/scripts
 ## CAN bus Commands and Reports
 ### Drive Commands
 1. **Left Motor: Set Speed Command**
-   -ID: 0x203
-   -Data: 0x01, <speed> (signed short value)
-2. **Right Motor: Set Speed Command**
-   -ID: 0x204
-   -Data: 0x01, <speed> (signed short value)
-
+```text
+   ID: 0x203
+   Data: 0x01, <speed> (signed short value)
+```
+3. **Right Motor: Set Speed Command**
+   ```text
+   ID: 0x204
+   Data: 0x01, <speed> (signed short value)
+   ```
 Example:
    -Left motor forward command:
    ```text
-      ID: 0x203
-      Data: 0x01, 0x5E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+   ID: 0x203
+   Data: 0x01, 0x5E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
    ```
    -Right motor forward command:
    ```text
-      ID: 0x204
-      Data: 0x01, 0xA2, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00
+   ID: 0x204
+   Data: 0x01, 0xA2, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00
    ```
 **In these examples, 0x5E, 0x00 (for the left motor) and 0xA2, 0xFF (for the right motor) represent signed short speed values in little-endian format**
 
 ### Reports
 1. **Rotation/Load Report**
    -**Left Motor**
-      -ID: 0x303
-      -Data: 0x03, <rpm> (short), <load> (short)
+   ```text
+   ID: 0x303
+   Data: 0x03, <rpm> (short), <load> (short)
+   ```
    -**Right Motor**
-      -ID: 0x304
-      -Data: 0x03, <rpm> (short), <load> (short)
+   ```text
+   ID: 0x304
+   Data: 0x03, <rpm> (short), <load> (short)
+   ```
 2. **IMU**
-      -ID: 0x302
-      -Data: 0x0C, <rollDeg> (ushort), <pitchDeg> (ushort), <yawDeg> (ushort)
-3. **Battery**
-      -ID: 0x309
-      -Data: 0x07, <batteryID>, <current> (short), <voltage> (short), <charge> (byte)
-
-
+   ```text
+   ID: 0x302
+   Data: 0x0C, <rollDeg> (ushort), <pitchDeg> (ushort), <yawDeg> (ushort)
+   ```
+4. **Battery**
+   ```text
+   ID: 0x309
+   Data: 0x07, <batteryID>, <current> (short), <voltage> (short), <charge> (byte)
+   ```
