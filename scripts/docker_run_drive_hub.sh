@@ -30,6 +30,7 @@ run_docker_cmd="docker run \
   --privileged \
   --cap-add=CAP_SYS_RESOURCE \
   -e ROS_DOMAIN_ID=1 \
+  -e ROS_LOCALHOST_ONLY=0 \
   -e PYTHONOPTIMIZE=2 \
   -e DISPLAY=$DISPLAY \
   -e QT_X11_NO_MITSHM=1 \
