@@ -63,18 +63,17 @@ Example:
 
 ### Reports
 1. **Rotation/Load Report**
-
--**Left Motor**
-   -ID: 0x303
-   -Data: 0x03, <rpm> (short), <load> (short)
--**Right Motor**
-   -ID: 0x304
-   -Data: 0x03, <rpm> (short), <load> (short)
+   -**Left Motor**
+      -ID: 0x303
+      -Data: 0x03, <rpm> (short), <load> (short)
+   -**Right Motor**
+      -ID: 0x304
+      -Data: 0x03, <rpm> (short), <load> (short)
 2. **IMU**
-   -ID: 0x302
-   -Data: 0x0C, <rollDeg> (ushort), <pitchDeg> (ushort), <yawDeg> (ushort)
+      -ID: 0x302
+      -Data: 0x0C, <rollDeg> (ushort), <pitchDeg> (ushort), <yawDeg> (ushort)
 3. **Battery**
-   -ID: 0x309
-   -Data: 0x07, <batteryID>, <current> (short), <voltage> (short), <charge> (byte)
+      -ID: 0x309
+      -Data: 0x07, <batteryID>, <current> (short), <voltage> (short), <charge> (byte)
 
 
