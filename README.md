@@ -52,7 +52,7 @@ cd /workspace/ROS2/scripts
    Data: 0x01, <speed> (signed short value)
    ```
 3. **Example:**
-      ---**Left motor forward command:**
+   -**Left motor forward command:**
       ```text
       ID: 0x203
       Data: 0x01, 0x5E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
