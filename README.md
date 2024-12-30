@@ -51,13 +51,13 @@ cd /workspace/ROS2/scripts
    ID: 0x204
    Data: 0x01, <speed> (signed short value)
    ```
-3. Example:
-   -Left motor forward command:
+3. **Example:**
+   Left motor forward command:
    ```text
    ID: 0x203
    Data: 0x01, 0x5E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
    ```
-   -Right motor forward command:
+   Right motor forward command:
    ```text
    ID: 0x204
    Data: 0x01, 0xA2, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00
