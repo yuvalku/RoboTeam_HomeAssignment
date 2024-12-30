@@ -52,16 +52,16 @@ cd /workspace/ROS2/scripts
    Data: 0x01, <speed> (signed short value)
    ```
 3. **Example:**
-   -**Left motor forward command:**
-   ```text
-   ID: 0x203
-   Data: 0x01, 0x5E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-   ```
-   -**Right motor forward command:**
-   ```text
-   ID: 0x204
-   Data: 0x01, 0xA2, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00
-   ```
+      **Left motor forward command:**
+      ```text
+      ID: 0x203
+      Data: 0x01, 0x5E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+      ```
+      **Right motor forward command:**
+      ```text
+      ID: 0x204
+      Data: 0x01, 0xA2, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00
+      ```
 **In these examples, 0x5E, 0x00 (for the left motor) and 0xA2, 0xFF (for the right motor) represent signed short speed values in little-endian format**
 
 ### Reports
