@@ -5,37 +5,37 @@ It implements an integration of ROS2 with CANOpenNode
 
 ## Docker build and run
 1. **Clone / Navigate**
-   ```bash
-      cd ~/ROS2
-   ```
+```bash
+cd ~/ROS2
+```
 2. **Build the ros2canopen Docker Image** (if not already built)
-   ```bash
-     sudo ./scripts/docker_build_ros2can.sh
-   ```
+```bash
+sudo ./scripts/docker_build_ros2can.sh
+```
    
    **Run the ros2canopen Docker Container**
-     ```bash
-      sudo ./scripts/docker_run_ros2can.sh
-     ```
+```bash
+sudo ./scripts/docker_run_ros2can.sh
+```
 
 3. **Build the drive_hub Docker Image** (if not already built): 
-     ```bash
-      sudo ./scripts/docker_build_drive_hub.sh
-     ```
+```bash
+sudo ./scripts/docker_build_drive_hub.sh
+```
    **Run the drive_hub Docker Container**
-     ```bash
-     sudo ./scripts/docker_run_drive_hub.sh
-     ```
+  ```bash
+  sudo ./scripts/docker_run_drive_hub.sh
+  ```
 
 ## CANBUS for ROOK:
 1. **Activate CAN bus on the Advantech Platform**
 ```bash
-   sudo bash /opt/advantech/tools/enable_can.sh
+sudo bash /opt/advantech/tools/enable_can.sh
 ```
 2. **Test the CAN bus**
 ```bash
-   cd /workspace/ROS2/scripts
-   ./can_test.sh
+cd /workspace/ROS2/scripts
+./can_test.sh
 ```
    If the motors start to run, the CAN bus setup is working correctly.
 
@@ -65,16 +65,16 @@ Example:
 1. **Rotation/Load Report**
 
 -**Left Motor**
-   ID: 0x303
-   Data: 0x03, <rpm> (short), <load> (short)
+   -ID: 0x303
+   -Data: 0x03, <rpm> (short), <load> (short)
 -**Right Motor**
-   ID: 0x304
-   Data: 0x03, <rpm> (short), <load> (short)
+   -ID: 0x304
+   -Data: 0x03, <rpm> (short), <load> (short)
 2. **IMU**
-   ID: 0x302
-   Data: 0x0C, <rollDeg> (ushort), <pitchDeg> (ushort), <yawDeg> (ushort)
+   -ID: 0x302
+   -Data: 0x0C, <rollDeg> (ushort), <pitchDeg> (ushort), <yawDeg> (ushort)
 3. **Battery**
-   ID: 0x309
-   Data: 0x07, <batteryID>, <current> (short), <voltage> (short), <charge> (byte)
+   -ID: 0x309
+   -Data: 0x07, <batteryID>, <current> (short), <voltage> (short), <charge> (byte)
 
 
