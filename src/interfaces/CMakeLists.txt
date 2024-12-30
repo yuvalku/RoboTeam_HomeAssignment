@@ -30,7 +30,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MpcInput.msg"
   "msg/MotorsVelocity.msg"
   "msg/CanFrame.msg"
-  "srv/CanRequest.srv"
   DEPENDENCIES geometry_msgs sensor_msgs std_msgs
 )
 
