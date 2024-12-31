@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "ps_controller_node = controllers.ps_controller_node:main"
+            "ps_controller_node = controllers.ps_controller_node:main",
+            "teleop_keyboard_node = controllers.teleop_keyboard_node:main"
         ],
     },
 )
