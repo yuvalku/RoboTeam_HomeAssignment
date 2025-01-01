@@ -68,6 +68,7 @@ class CanRos2Status(Node):
             if not frame:
                 break
             can_id, data = frame
+            #self.get_logger().info(f"Received CAN frame: {can_id}, {data}")
             parsed_fields = self.bridge.parse_incoming_frame(can_id, data)
             self.update_fields(parsed_fields)
         
@@ -76,6 +77,7 @@ class CanRos2Status(Node):
         Use the dictionary from parse_incoming_frame
         to update each FieldFilter or direct variable.
         """
+        #self.get_logger().info(f"fields {fields}")
         if 'left_rpm' in fields:
             self.left_rpm_filter.update(fields['left_rpm'])
         if 'right_rpm' in fields:
@@ -161,7 +163,7 @@ class CanRos2Status(Node):
         msg.battery_bit_error = self.battery_bit_error
 
         self.status_publisher.publish(msg)
-
+        self.get_logger().info(f"Publishing message: {msg}")
 
 
 def main(args=None):

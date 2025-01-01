@@ -24,7 +24,7 @@ class CanBridge:
         Use parse_frame() with the current robot config to interpret the data.
         Returns a dict of parsed fields (e.g. {'left_rpm': 100, 'right_rpm': 120}).
         """
-        return parse_frame(self.config, can_id, data)
+        return parse_frame(can_id, data)
     
     def _send_can_message(self, arbitration_id, data):
         try:
