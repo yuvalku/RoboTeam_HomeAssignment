@@ -50,7 +50,7 @@ def generate_launch_description():
     )
     
     ld.add_action(drive_hub_node)
-    ld.add_action(input_vel_tester)
+    #ld.add_action(input_vel_tester)
     ld.add_action(imu_tester)
     ld.add_action(mpc_tester)
 

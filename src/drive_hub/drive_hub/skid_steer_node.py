@@ -24,7 +24,7 @@ class DifferentialDrive:
 
 def load_settings(filename):
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    settings_path = os.path.join(os.path.abspath(os.path.join(current_dir, "..", "utilities")), filename)
+    settings_path = "/workspaces/ros2_workspace/src/drive_hub/utilities/settings.xml"
 
     tree = ET.parse(settings_path)
     root = tree.getroot()

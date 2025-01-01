@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             "ros2can_node = ros2can.ros2can_node:main",
-            "can_listener_node = ros2can.can_listener_node:main"
+            "can_ros2_status_node = ros2can.can_ros2_status_node:main"
         ],
     },
 )
