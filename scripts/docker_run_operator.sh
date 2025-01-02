@@ -40,7 +40,7 @@ run_docker_cmd="docker run \
   python3 -m pip install --upgrade pip && \
   pip install black==21.12b0 uvloop==0.17.0 && \
   pip install --upgrade typing-extensions && \
-  rm -rf drive_hub/ ros2can/ tester/
+  rm -rf drive_hub/ ros2can/ tester/ rook_description/ &&\
   /bin/bash\""
   
 echo -e "${CYAN_BOLD}$run_docker_cmd${NC}"
