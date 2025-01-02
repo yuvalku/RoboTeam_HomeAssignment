@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'controllers'
+package_name = 'operator'
 
 setup(
     name=package_name,
@@ -20,8 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "ps_controller_node = controllers.ps_controller_node:main",
-            "teleop_keyboard_node = controllers.teleop_keyboard_node:main"
+            "ps_controller_node = operator.ps_controller_node:main",
+            "teleop_keyboard_node = operator.teleop_keyboard_node:main",
+            "rook_status_display_node = operator.rook_status_display_node:main"
         ],
     },
 )

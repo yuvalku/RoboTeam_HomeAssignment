@@ -37,9 +37,9 @@ run_docker_cmd="docker run \
   -e XDG_RUNTIME_DIR=/tmp/xdg \
    $docker_image \
   /bin/bash -c \"pip install python-can && \
+  python3 -m pip install --upgrade pip && \
   pip install black==21.12b0 uvloop==0.17.0 && \
   pip install --upgrade typing-extensions && \
-  python3 -m pip install --upgrade pip && \
   /bin/bash\""
   
 echo -e "${CYAN_BOLD}$run_docker_cmd${NC}"

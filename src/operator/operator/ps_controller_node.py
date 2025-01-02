@@ -1,5 +1,5 @@
 import rclpy
-from rclpy import Node
+from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import pygame
 

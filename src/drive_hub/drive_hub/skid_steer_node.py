@@ -47,7 +47,7 @@ class SkidSteerNode(Node):
         self.motors_vel_pub = self.create_publisher(MotorsVelocity, 'motors_vel', 10)
         
         # Timer for odometry publishing (currently not implemented)
-        self.create_timer(0.1, self.publish_odometry)
+        #self.create_timer(0.1, self.publish_odometry)
 
     def on_cmd_vel(self, msg: Twist):
         motors_velocity = MotorsVelocity()
