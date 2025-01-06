@@ -29,6 +29,7 @@ run_docker_cmd="docker run \
   --cap-add SYS_PTRACE \
   --privileged \
   --cap-add=CAP_SYS_RESOURCE \
+  --device=/dev/input/js0 \
   -e ROS_DOMAIN_ID=1 \
   -e ROS_LOCALHOST_ONLY=0 \
   -e PYTHONOPTIMIZE=2 \
