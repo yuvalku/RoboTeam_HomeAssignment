@@ -3,6 +3,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import pygame
 
+
 class XBoxJoystickController(Node):
     def __init__(self):
         super().__init__('xbox_joystick_controller')
@@ -28,6 +29,7 @@ class XBoxJoystickController(Node):
             # Publish zero velocity when e-stop is active
             self.publish_velocity(0.0, 0.0)
             return
+        
         linear_velocity = self.joystick.get_axis(1)
         angular_velocity = self.joystick.get_axis(0)
         linear_velocity = -linear_velocity * 250.0
