@@ -15,6 +15,17 @@ def generate_launch_description():
                 'stderr': 'screen',
         }
     )
+
+    skid_steer = Node(
+        package='drive_hub',
+        name='skid_steer_node',
+        executable='skid_steer_node',
+        emulate_tty=True,
+        output={ 
+                'stdout': 'screen',
+                'stderr': 'screen',
+        }
+    )
     
     input_vel_tester = Node(
         package='tester',
@@ -50,7 +61,7 @@ def generate_launch_description():
     )
     
     ld.add_action(drive_hub_node)
-    #ld.add_action(input_vel_tester)
+    #ld.add_action(skid_steer)
     ld.add_action(imu_tester)
     ld.add_action(mpc_tester)
 

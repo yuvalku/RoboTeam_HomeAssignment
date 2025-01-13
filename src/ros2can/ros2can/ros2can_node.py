@@ -28,11 +28,11 @@ class Ros2Can(Node):
 
         self.bridge.send_speed_cmd(
             left_speed=left_speed, 
-            right_speed=right_speed, 
+            right_speed=-right_speed, 
         )
-        self.get_logger().info(
-            f"Received motors_vel: L=({left_speed}, dir={left_dir}), R=({right_speed}, dir={right_dir})"
-        )
+        # self.get_logger().info(
+        #     f"Received motors_vel: L=({left_speed}, dir={left_dir}), R=({right_speed}, dir={right_dir})"
+        # )
 
         # def send_heartbeat(self):
         #     """

@@ -35,7 +35,7 @@ class CanBridge:
 
     def send_motor_cmd_rook(self, left_velocity, right_velocity):
         left_id  = self.config.get('CMD_MOTOR_LEFT')
-        right_id = self.config.get('CMD_MOTOR_LEFT')
+        right_id = self.config.get('CMD_MOTOR_RIGHT')
 
         # Example data format from your old code
         left_data  = [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
@@ -97,9 +97,10 @@ class CanBridge:
 
     def set_rook_data(self, velocity):
         if velocity < 0:
+            not_value = ~abs(velocity) & 0xFF
             if velocity > -256:
-                return abs(velocity), 0xFF
-            return abs(velocity) % 256, 0xFE
+                return not_value, 0xFF
+            return not_value, 0xFE
         
         if velocity < 256:
             return velocity, 0x00

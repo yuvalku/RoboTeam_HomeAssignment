@@ -1,5 +1,5 @@
 <settings>
-    <num_motors>6</num_motors> <!-- Options: 4 or 6 -->
-    <motor_radius>0.1</motor_radius> <!-- in meters -->
+    <num_motors>2</num_motors> <!-- Options: 4 or 2 -->
+    <!--<motor_radius>0.1</motor_radius> in meters -->
     <motor_separation>0.5</motor_separation> <!-- in meters -->
 </settings>
