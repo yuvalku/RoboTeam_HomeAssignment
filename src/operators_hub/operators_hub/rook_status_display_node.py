@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 
 # Import your RobotStatus message
-from my_robot.msg import RobotStatus
+from interfaces.msg import RobotStatus
 
 class RookStatusDisplayNode(Node):
     def __init__(self):
