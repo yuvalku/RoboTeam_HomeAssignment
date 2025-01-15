@@ -14,7 +14,7 @@ class VideoStreamNode(Node):
         self.pipeline = GStreamerPipeline("rtsp://192.168.126.200:554/av0_")
         self.bridge = CvBridge()
         self.image_pub = self.create_publisher(Image, 'video_frames', 10)
-        self.timer = self.create_timer(0.1, self.publish_frame)  # ~30 FPS
+        self.timer = self.create_timer(0.03, self.publish_frame)  # ~30 FPS
         self.pipeline.start()
         self.counter = 0
 

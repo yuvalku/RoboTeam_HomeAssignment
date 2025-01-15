@@ -15,7 +15,7 @@ class GStreamerPipeline:
 
         Gst.init(None)
         pipeline_str = (
-            f"rtspsrc location={self.source} latency=300 ! "
+            f"rtspsrc location={self.source} latency=100 ! "
             "rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGR ! appsink name=appsink"
         )
 
