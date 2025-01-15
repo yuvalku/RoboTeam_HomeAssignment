@@ -1,16 +1,19 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
 import pygame
 from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge
+from cameras.camera_manager import CameraManager
 
 
 class XBoxJoystickController(Node):
     def __init__(self):
         super().__init__('xbox_joystick_controller')
         self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel_input', 10)
+        self.camera_ip_pub = self.create_publisher(String, 'camera_ip', 10)
         self.image_sub = self.create_subscription(Image, 'video_frames', self.image_callback, 10)
 
         pygame.init()
@@ -22,7 +25,10 @@ class XBoxJoystickController(Node):
         self.display_video = False
         self.e_stop_active = False
         self.current_frame = None
-        self.timer = self.create_timer(0.02, self.read_joystick) 
+        self.timer = self.create_timer(0.03, self.read_joystick) 
+        self.camera_manager = CameraManager("ROOK_1171")
+        self.current_camera_ip = self.camera_manager.get_initial_camera_ip()
+        self.publish_camera_ip(self.current_camera_ip)
         #self.display_timer = self.create_timer(0.03, self.display_frame)
         #self.get_logger().info(f'Joystick initialized: {self.joystick.get_name()}')
 
@@ -45,6 +51,14 @@ class XBoxJoystickController(Node):
             else:
                 self.stop_video_subscription()
             pygame.time.wait(300)
+        
+        if self.joystick.get_button(2) and self.display_video:
+            self.current_camera = self.camera_manager.toggle_camera()
+            self.publish_camera_ip(self.current_camera)
+            self.restart_video_subscription()
+            #self.get_logger().info(f"Switched to camera: {camera_name}")
+            pygame.time.wait(300)
+
 
         linear_velocity = self.joystick.get_axis(1)
         angular_velocity = self.joystick.get_axis(0)
@@ -55,6 +69,11 @@ class XBoxJoystickController(Node):
         #self.get_logger().info(f'Liner Velocity: {linear_velocity}')
         self.publish_velocity(linear_velocity, angular_velocity)
         
+    def publish_camera_ip(self, ip):
+        msg = String()
+        msg.data = ip
+        self.camera_ip_pub.publish(msg)
+        self.get_logger().info(f"Published new camera IP: {ip}")
 
     def publish_velocity(self, linear_velocity, angular_velocity):
         cmd_vel_msg = Twist()
@@ -80,6 +99,10 @@ class XBoxJoystickController(Node):
             self.image_sub = None
             cv2.destroyAllWindows()
 
+    def restart_video_subscription(self):
+        self.stop_video_subscription()
+        self.start_video_subscription()
+        
     def display_image(self, msg):
         if self.current_frame is not None:
             # Display the current frame using OpenCV
