@@ -9,3 +9,4 @@ src/*/test/
 src/interfaces/srv/*
 src/rook_canopen/*
 src/rook_description/*
+build_context/*

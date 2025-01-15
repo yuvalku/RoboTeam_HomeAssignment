@@ -1,0 +1,80 @@
+# Base image from NVIDIA JetPack
+FROM nvcr.io/nvidia/l4t-jetpack:r36.4.0
+
+# Set non-interactive mode for APT
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Add ROS 2 APT repository and keys
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl gnupg2 lsb-release \
+    && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - \
+    && sh -c 'echo "deb [trusted=yes] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list' \
+    && apt-get update
+
+# Install system dependencies, ROS 2 tools, and rosdep
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    python3-pip \
+    python3-venv \
+    python3-rosdep \
+    python3-colcon-common-extensions \
+    ros-humble-desktop \
+    libssl-dev \
+    libboost-all-dev \
+    pkg-config \
+    libglib2.0-dev \
+    libcairo2-dev \
+    libgirepository1.0-dev \
+    flex \
+    bison \
+    gstreamer1.0-tools \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    python3-opencv \
+    python3-gi \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Downgrade setuptools and numpy for compatibility
+RUN python3 -m pip install --upgrade pip \
+    && pip3 install "setuptools<60" "numpy<2.0" scipy asyncio pyulog
+
+# Initialize rosdep
+RUN rosdep init && rosdep update
+
+# Set environment variables for GStreamer, OpenCV, and ROS 2
+ENV PYTHON=/usr/bin/python3
+ENV GI_TYPELIB_PATH=/usr/lib/aarch64-linux-gnu/girepository-1.0:$GI_TYPELIB_PATH
+ENV GST_PLUGIN_PATH=/usr/lib/aarch64-linux-gnu/gstreamer-1.0:$GST_PLUGIN_PATH
+ENV LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH
+ENV PYTHONPATH=/usr/lib/python3/site-packages:$PYTHONPATH
+ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libGLdispatch.so:$LD_PRELOAD
+ENV ROS_DOMAIN_ID=1
+ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+ENV TERM=xterm-256color
+
+# Create workspace
+ARG WORKSPACE=/workspaces/ros2_workspace
+RUN mkdir -p $WORKSPACE/src
+WORKDIR $WORKSPACE/src
+
+# Install ROS dependencies for the workspace
+RUN apt-get update && rosdep update \
+    && rosdep install --from-paths $WORKSPACE/src --ignore-src -r -y
+
+# Build the workspace
+WORKDIR $WORKSPACE
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
+
+# Add workspace setup to bashrc
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc \
+    && echo "source $WORKSPACE/install/setup.bash" >> ~/.bashrc
+
+# Set default command to keep container running
+CMD ["bash"]
