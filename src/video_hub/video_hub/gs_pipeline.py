@@ -15,8 +15,10 @@ class GStreamerPipeline:
 
         Gst.init(None)
         pipeline_str = (
-            f"rtspsrc location={self.source} latency=100 ! "
-            "rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGR ! appsink name=appsink"
+            f"rtspsrc location={self.source} latency=60 ! "
+                "rtph264depay ! h264parse ! nvv4l2decoder ! nvvidconv ! jpegenc ! "
+                "queue max-size-buffers=5 leaky=downstream ! "
+                "appsink name=appsink drop=true max-buffers=1"
         )
 
         self.pipeline = Gst.parse_launch(pipeline_str)
@@ -47,7 +49,7 @@ class GStreamerPipeline:
             height = caps.get_structure(0).get_value("height")
 
             data = buf.extract_dup(0, buf.get_size())
-            frame = np.frombuffer(data, dtype=np.uint8).reshape((height, width, 3))
+            frame = cv2.imdecode(np.frombuffer(data, dtype=np.uint8), cv2.IMREAD_COLOR)
             return frame
         return None
     
