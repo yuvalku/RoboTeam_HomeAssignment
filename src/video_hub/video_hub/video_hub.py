@@ -4,7 +4,6 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from cv_bridge import CvBridge
 from gi.repository import Gst, GLib
-import numpy as np
 import threading
 from video_hub.gs_pipeline import GStreamerPipeline
 
@@ -16,10 +15,11 @@ class VideoStreamNode(Node):
         self.bridge = CvBridge()
         self.image_pub = self.create_publisher(Image, 'video_frames', 10)
         self.camera_ip_sub = self.create_subscription(String, 'camera_ip', self.update_camera_ip, 10)
-        self.timer = self.create_timer(0.03, self.publish_frame)  # ~30 FPS
+        self.timer = self.create_timer(0.05, self.publish_frame)  # ~30 FPS
         self.current_ip = None
         self.initialized = False
         self.counter = 0
+        self.pipeline_thread = None
         self.stop_event = threading.Event()
 
     def update_camera_ip(self, msg):
@@ -42,6 +42,7 @@ class VideoStreamNode(Node):
             self.stop_event.set()
             if self.pipeline_thread and self.pipeline_thread.is_alive():
                 self.pipeline_thread.join()
+                self.pipeline_thread = None
             self.pipeline.stop()
             self.pipeline = None
 
@@ -61,9 +62,6 @@ class VideoStreamNode(Node):
         else:
             self.get_logger().warning("Failed to get frame from pipeline.")
 
-    def destroy_node(self):
-        self.stop_pipeline()
-        super().destroy_node()
 
 
 def main(args=None):
