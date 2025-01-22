@@ -18,7 +18,7 @@ echo $PWD
 echo -e "${GREEN}Setting X11 permissions...${NC}"
 xhost +local:docker
 
-# Run Docker container
+# Docker run command
 run_docker_cmd="docker run \
   --name $container_name \
   --net=host \
@@ -40,7 +40,13 @@ run_docker_cmd="docker run \
   -e QT_X11_NO_MITSHM=1 \
   -e XDG_RUNTIME_DIR=/tmp/xdg \
   $docker_image \
-  bash"
+  bash -c ' \
+    echo -e \"${GREEN}Installing required Python packages...${NC}\" && \
+    pip3 install \"numpy<2\" && \
+    sudo apt update && \
+    sudo apt install -y python3-gi python3-gi-cairo && \
+    echo -e \"${GREEN}Environment is ready!${NC}\" && \
+    exec bash'"
   
 # Print and execute the Docker run command
 echo -e "${CYAN_BOLD}$run_docker_cmd${NC}"
