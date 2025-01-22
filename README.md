@@ -31,6 +31,9 @@ sudo ./scripts/docker_build_drive_hub.sh
 1. **Activate CAN bus on the Advantech Platform**
 ```bash
 sudo bash /opt/advantech/tools/enable_can.sh
+sudo ip link set can0 down
+sudo ip link set can0 type can bitrate 500000
+sudo ip link set can0 up
 ```
 2. **Test the CAN bus**
 ```bash
