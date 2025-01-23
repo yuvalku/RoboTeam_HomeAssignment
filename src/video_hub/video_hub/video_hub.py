@@ -3,9 +3,11 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from cv_bridge import CvBridge
-from gi.repository import Gst, GLib
+import cv2
+from gi.repository import GLib
 import threading
 from video_hub.gs_pipeline import GStreamerPipeline
+from interfaces.srv import GetCameraIp
 
 class VideoStreamNode(Node):
     def __init__(self):
@@ -14,13 +16,34 @@ class VideoStreamNode(Node):
         self.pipeline_thread = None
         self.bridge = CvBridge()
         self.image_pub = self.create_publisher(Image, 'video_frames', 10)
-        self.camera_ip_sub = self.create_subscription(String, 'camera_ip', self.update_camera_ip, 10)
+        self.camera_ip_sub = self.create_subscription(String, 'camera_ip_change', self.update_camera_ip, 10)
+        self.ip_client = self.create_client(GetCameraIp, 'get_camera_ip')
         self.timer = self.create_timer(0.05, self.publish_frame)  # ~30 FPS
         self.current_ip = None
         self.initialized = False
         self.counter = 0
         self.pipeline_thread = None
         self.stop_event = threading.Event()
+        self.counter = 0
+
+        self.request_initial_ip()
+
+    def request_initial_ip(self):
+        while not self.ip_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("Waiting for 'get_camera_ip' service...")
+        try:
+            request = GetCameraIp.Request()
+            future = self.ip_client.call_async(request)
+            rclpy.spin_until_future_complete(self,future)
+            if future.result():
+                self.current_ip = future.result().camera_ip
+                self.get_logger().info(f"Initialized with camera IP: {self.current_ip}")
+                self.restart_pipeline(self.current_ip)
+                return True
+        except Exception as e:
+            self.get_logger().error(f"Service call failed: {e}")
+        return False
+
 
     def update_camera_ip(self, msg):
         new_ip = msg.data
@@ -33,13 +56,13 @@ class VideoStreamNode(Node):
         self.stop_pipeline()
         self.pipeline = GStreamerPipeline(ip)
         self.stop_event.clear()
-        self.pipeline_thread = threading.Thread(target=self.run_pipeline, daemon=True)
-        self.pipeline_thread.start()
+        self.pipeline_thread = threading.Thread(target=self.run_pipeline, daemon=True).start()
         self.initialized = True
 
     def stop_pipeline(self):
         if self.pipeline:
             self.stop_event.set()
+            self.initialized = False
             if self.pipeline_thread and self.pipeline_thread.is_alive():
                 self.pipeline_thread.join()
                 self.pipeline_thread = None
@@ -59,6 +82,8 @@ class VideoStreamNode(Node):
         if frame is not None:
             ros_image = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
             self.image_pub.publish(ros_image)
+            self.get_logger().info("Frame Published!")
+            self.counter += 1
         else:
             self.get_logger().warning("Failed to get frame from pipeline.")
 
