@@ -26,13 +26,24 @@ class UnityTeleop(Node):
         self.current_frame = None
         self.camera_manager = CameraManager("ROOK_1171")
         self.current_camera_ip = self.camera_manager.get_initial_camera_ip()
-
+        self.counter = 0
         # Initialize ZMQ module
         self.zmq_module = ZMQModule(host="0.0.0.0", port_out=5555, port_in=5556)
         self.get_logger().info("ZMQ module initialized.")
 
         # Timer to process incoming messages and publish odometry/status
         self.timer = self.create_timer(0.1, self.process_message)
+
+    def process_message(self):
+        """
+        Periodically checks for new ZMQ messages and processes them.
+        """
+        message = self.zmq_module.get_message()
+        if message:
+            self.get_logger().info(f"Received ZMQ message: {message}")
+            # self.handle_data(message)
+            # self.publish_cmd()
+
 
     def handle_camera_ip_request(self, request, response):
         response.camera_ip = self.current_camera_ip
@@ -60,8 +71,10 @@ class UnityTeleop(Node):
             _, encoded_image = cv2.imencode('.jpg', cv_image)
 
             # Send the encoded image to the MQ
-            self.zmq_module.send_message(encoded_image.tobytes())
+            #self.zmq_module.send_message("video", encoded_image.tobytes())
+            cv2.imwrite(f"image_{self.counter}.jpg", cv_image)
             self.get_logger().info("Image sent to the MQ.")
+            #self.counter +=1
         except Exception as e:
             self.get_logger().error(f"Failed to process image: {e}")
 
