@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 
 class ZMQModule:
-    def __init__(self, host='10.0.70.24', port_in=5555, port_out=5556):
+    def __init__(self, host='127.0.0.1', port_in=5555, port_out=5556):
         """
         Initialize the ZMQ module with separate channels for receiving and sending.
         
@@ -21,7 +21,7 @@ class ZMQModule:
 
         # PUB socket for sending data
         self.pub_socket = self.context.socket(zmq.PUB)
-        self.pub_socket.bind(f"tcp://0.0.0.0:{self.port_out}")  # Bind to all available interfaces for sending
+        self.pub_socket.bind(f"tcp://{self.host}:{self.port_out}")  # Bind to all available interfaces for sending
 
         # SUB socket for receiving data
         self.sub_socket = self.context.socket(zmq.SUB)
@@ -63,19 +63,15 @@ class ZMQModule:
                 return None
 
     def send_message(self, topic, message):
-        """
-        Send a message through the PUB socket.
-        
-        Args:
-            topic (str): The topic of the message.
-            message (str | np.ndarray): The message content. If it's a NumPy array, it will be sent as an image.
-        """
         try:
-            if isinstance(message, np.ndarray):
+            # Always send as multipart
+            if isinstance(message, bytes):
+                self.pub_socket.send_multipart([topic.encode(), message])
+            elif isinstance(message, np.ndarray):
                 _, encoded_image = cv2.imencode('.jpg', message)  # Encode NumPy array as JPEG
                 self.pub_socket.send_multipart([topic.encode(), encoded_image.tobytes()])
             else:
-                self.pub_socket.send_string(f"{topic} {message}")
+                self.pub_socket.send_multipart([topic.encode(), message.encode()])
         except Exception as e:
             print(f"Error sending message: {e}")
 

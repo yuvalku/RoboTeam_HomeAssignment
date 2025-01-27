@@ -1,9 +1,9 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from cv_bridge import CvBridge
-import cv2
 from gi.repository import GLib
 import threading
 from video_hub.gs_pipeline import GStreamerPipeline
@@ -15,10 +15,11 @@ class VideoStreamNode(Node):
         self.pipeline = None
         self.pipeline_thread = None
         self.bridge = CvBridge()
+        qos_video_profile = QoSProfile(depth=1, reliability=QoSReliabilityPolicy.BEST_EFFORT, durability=QoSDurabilityPolicy.VOLATILE)
         self.image_pub = self.create_publisher(Image, 'video_frames', 10)
-        self.camera_ip_sub = self.create_subscription(String, 'camera_ip_change', self.update_camera_ip, 10)
+        self.camera_ip_sub = self.create_subscription(String, 'camera_ip_change', self.update_camera_ip, qos_video_profile)
         self.ip_client = self.create_client(GetCameraIp, 'get_camera_ip')
-        self.timer = self.create_timer(0.05, self.publish_frame)  # ~30 FPS
+        self.timer = self.create_timer(0.03, self.publish_frame)  # ~30 FPS
         self.current_ip = None
         self.initialized = False
         self.counter = 0
@@ -31,12 +32,14 @@ class VideoStreamNode(Node):
     def request_initial_ip(self):
         while not self.ip_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Waiting for 'get_camera_ip' service...")
+        
         try:
             request = GetCameraIp.Request()
             future = self.ip_client.call_async(request)
             rclpy.spin_until_future_complete(self,future)
             if future.result():
-                self.current_ip = future.result().camera_ip
+                if not self.current_ip:
+                    self.current_ip = future.result().camera_ip
                 self.get_logger().info(f"Initialized with camera IP: {self.current_ip}")
                 self.restart_pipeline(self.current_ip)
                 return True

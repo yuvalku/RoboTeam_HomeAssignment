@@ -19,6 +19,8 @@ RUN apt-get update \
     && pip3 install python-can \
     && pip3 install black==21.12b0 uvloop==0.17.0 \
     && pip3 install --upgrade typing-extensions \
+    && pip3 install "numpy<2" \
+    && pip3 install pyzmq \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
