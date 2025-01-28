@@ -5,23 +5,15 @@ import numpy as np
 import cv2
 
 class ZMQModule:
-    def __init__(self, host='127.0.0.1', port_in=5555, port_out=5556):
-        """
-        Initialize the ZMQ module with separate channels for receiving and sending.
-        
-        Args:
-            host (str): IP address of the server.
-            port_in (int): Port for incoming messages (SUB socket).
-            port_out (int): Port for outgoing messages (PUB socket).
-        """
+    def __init__(self, host='127.0.0.1', port_in=5557, video_port_out=5556):
         self.host = host
         self.port_in = port_in
-        self.port_out = port_out
+        self.video_port_out = video_port_out
         self.context = zmq.Context()
 
         # PUB socket for sending data
         self.pub_socket = self.context.socket(zmq.PUB)
-        self.pub_socket.bind(f"tcp://{self.host}:{self.port_out}")  # Bind to all available interfaces for sending
+        self.pub_socket.bind(f"tcp://{self.host}:{self.video_port_out}")  # Bind to all available interfaces for sending
 
         # SUB socket for receiving data
         self.sub_socket = self.context.socket(zmq.SUB)
@@ -38,9 +30,6 @@ class ZMQModule:
         self.receiver_thread.start()
 
     def _receive_messages(self):
-        """
-        Continuously receive messages from the SUB socket and add them to the queue.
-        """
         while self.running:
             try:
                 message = self.sub_socket.recv_string(flags=zmq.NOBLOCK)
@@ -50,15 +39,10 @@ class ZMQModule:
                 pass  # No messages to receive
 
     def get_message(self):
-        """
-        Retrieve the latest message from the queue in a thread-safe manner.
-        
-        Returns:
-            str: The next message from the queue, or None if the queue is empty.
-        """
         with self.lock:
             try:
-                return self.message_queue.get_nowait()
+                topic, data = self.message_queue.get_nowait()
+                return Message(topic=topic, data=data)
             except queue.Empty:
                 return None
 
@@ -76,12 +60,16 @@ class ZMQModule:
             print(f"Error sending message: {e}")
 
     def close(self):
-        """
-        Cleanly close the ZMQ sockets and terminate the context.
-        """
         self.running = False
         self.receiver_thread.join()  # Wait for the receiver thread to finish
         self.pub_socket.close()
         self.sub_socket.close()
         self.context.term()
 
+class Message:
+    def __init__(self, topic, data):
+        self.topic = topic
+        self.data = data
+
+    def __repr__(self):
+        return f"Message(topic='{self.topic}', data={self.data})"

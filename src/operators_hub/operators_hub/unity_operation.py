@@ -23,9 +23,12 @@ class UnityTeleop(Node):
         self.linear_velocity = 0.0
         self.angular_velocity = 0.0
         self.bridge = CvBridge()
+        self.display_video = False
         self.e_stop_active = False
+        self.current_frame = None
         self.camera_manager = CameraManager("ROOK_1171")
         self.current_camera_ip = self.camera_manager.get_initial_camera_ip()
+        self.counter = 0
         # Initialize ZMQ module
         self.zmq_module = ZMQModule()
         self.get_logger().info("ZMQ module initialized.")
@@ -34,21 +37,11 @@ class UnityTeleop(Node):
         self.timer = self.create_timer(0.1, self.process_message)
 
     def process_message(self):
-        """
-        Periodically checks for new ZMQ messages and processes them.
-        """
+
         message = self.zmq_module.get_message()
         if message:
             self.get_logger().info(f"Received ZMQ message: {message}")
-            # self.handle_data(message)
-            # self.publish_cmd()
-
-
-    def process_message(self):
-        message = self.zmq_module.get_message()
-        if message:
-            self.get_logger().info(f"Received ZMQ message: {message}")
-            # self.handle_data(message)
+            self.handle_data(message)
             # self.publish_cmd()
 
 
@@ -73,36 +66,57 @@ class UnityTeleop(Node):
 
             # Encode as JPEG and publish to ZMQ
             _, encoded_image = cv2.imencode('.jpg', cv_image)
+            #cv2.imwrite( f"frame_{self.counter}.jpg", cv_image)
             self.zmq_module.send_message("video", encoded_image.tobytes())
             self.get_logger().info(f"Sent image to ZMQ, size: {len(encoded_image.tobytes())}")
+            #self.counter += 1
         except Exception as e:
             self.get_logger().error(f"Failed to process image: {e}")
 
         
     def handle_data(self, message):
-        if message in ['forward', 'backward', 'left', 'right']:
-            if message == 'forward':
-                self.linear_velocity = self.current_speed
-                self.angular_velocity = 0.0
-            elif message == 'backward':
-                self.linear_velocity = -self.current_speed
-                self.angular_velocity = 0.0
-            elif message == 'left':
-                self.linear_velocity = 0.0
-                self.angular_velocity = self.current_speed
-            elif message == 'right':
-                self.linear_velocity = 0.0
-                self.angular_velocity = -self.current_speed
+        """
+        Handles directional commands and updates linear/angular velocities.
+        """
+        if message.topic in ['switch_camera', 'drive']:
+            if message == 'switch_camera':
+                current_camera = CameraManager.toggle_camera()
+                self.publish_camera_ip_change(current_camera)
+                self.restart_video_subscription()
+
         # else:
         #     self.get_logger().warning(f"Unknown command received: {message}")
 
     def publish_cmd(self):
+        """
+        Publishes the current velocities as a Twist message.
+        """
         twist = Twist()
         twist.linear.x = self.linear_velocity
         twist.angular.z = self.angular_velocity
         self.publisher.publish(twist)
 
+
+    def start_video_subscription(self):
+        self.image_sub = self.create_subscription(
+            Image, 'video_frames', self.display_image, 10
+        )
+
+    def stop_video_subscription(self):
+        if self.image_sub:
+            self.destroy_subscription(self.image_sub)
+            self.image_sub = None
+            cv2.destroyAllWindows()
+
+    def restart_video_subscription(self):
+        self.stop_video_subscription()
+        self.start_video_subscription()
+
+
     def destroy_node(self):
+        """
+        Cleanup resources on node destruction.
+        """
         self.zmq_module.close()
         super().destroy_node()
 
