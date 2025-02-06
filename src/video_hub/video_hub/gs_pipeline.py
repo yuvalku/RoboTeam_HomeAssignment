@@ -50,7 +50,6 @@ class GStreamerPipeline:
     def get_frame(self):
         if not self.sample:
             # No sample available yet
-            print("No sample available.")
             return None, None, None
 
         buf = self.sample.get_buffer()
