@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             "ps_controller_node = operators_hub.ps_controller_node:main",
             "teleop_keyboard_node = operators_hub.teleop_keyboard_node:main",
-            "rook_status_display_node = operators_hub.rook_status_display_node:main"
+            "rook_status_display_node = operators_hub.rook_status_display_node:main",
+            "unity_teleop_node = operators_hub.unity_operation:main"
         ],
     },
 )

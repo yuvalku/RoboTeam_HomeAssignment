@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && sh -c 'echo "deb [trusted=yes] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list' \
     && apt-get update
 
-# Install system dependencies, ROS 2 tools, and rosdep
+# Install system dependencies and ROS 2 tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
@@ -37,14 +37,61 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gstreamer1.0-libav \
     libgstreamer1.0-dev \
     libgstreamer-plugins-base1.0-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libv4l-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    libopenexr-dev \
+    libatlas-base-dev \
+    libopencv-dev \
     python3-opencv \
     python3-gi \
     python3-gi-cairo \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Install CUDA tools (optional for compatibility)
+RUN apt-get update && apt-get install -y \
+    nvidia-cuda-toolkit nvidia-cuda-dev nvidia-cuda-gdb
+
 # Downgrade setuptools and numpy for compatibility
 RUN python3 -m pip install --upgrade pip \
     && pip3 install "setuptools<60" "numpy<2.0" scipy asyncio pyulog
+
+# Build OpenCV with CUDA support
+RUN git clone --depth=1 https://github.com/opencv/opencv.git /opencv \
+    && git clone --depth=1 https://github.com/opencv/opencv_contrib.git /opencv_contrib \
+    && mkdir -p /opencv/build && cd /opencv/build \
+    && cmake -D CMAKE_BUILD_TYPE=Release \
+             -D CMAKE_INSTALL_PREFIX=/usr/local \
+             -D OPENCV_EXTRA_MODULES_PATH=/opencv_contrib/modules \
+             -D WITH_CUDA=ON \
+             -D ENABLE_FAST_MATH=1 \
+             -D CUDA_FAST_MATH=1 \
+             -D WITH_CUBLAS=1 \
+             -D BUILD_opencv_cudacodec=ON \
+             -D CUDA_ARCH_BIN="7.2" \ 
+             -D WITH_GSTREAMER=ON \
+             -D BUILD_EXAMPLES=OFF \
+             .. \
+    && make -j$(nproc) && make install && ldconfig \
+    && rm -rf /opencv /opencv_contrib
+
+# Install CycloneDDS
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-rmw-cyclonedds-cpp \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Configure CycloneDDS as default
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+# Optional: Provide a CycloneDDS configuration file
+# Copy your custom CycloneDDS XML configuration if needed
+# COPY cyclonedds.xml /root/.dds/cyclonedds.xml
 
 # Initialize rosdep
 RUN rosdep init && rosdep update
@@ -57,7 +104,6 @@ ENV LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH
 ENV PYTHONPATH=/usr/lib/python3/site-packages:$PYTHONPATH
 ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libGLdispatch.so:$LD_PRELOAD
 ENV ROS_DOMAIN_ID=1
-ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 ENV TERM=xterm-256color
 
 # Create workspace

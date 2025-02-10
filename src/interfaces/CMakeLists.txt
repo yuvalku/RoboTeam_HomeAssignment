@@ -31,6 +31,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MotorsVelocity.msg"
   "msg/CanFrame.msg"
   "msg/RobotStatus.msg"
+  "msg/Image420.msg"
+  "srv/GetCameraIp.srv"
   DEPENDENCIES geometry_msgs sensor_msgs std_msgs
 )
 
