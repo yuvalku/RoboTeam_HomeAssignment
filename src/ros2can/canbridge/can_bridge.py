@@ -1,14 +1,22 @@
 import can
 from .can_config import get_robot_conf
 from .can_parser import parse_frame
+from .messages.RookMessage import RookMessage
 import xml.etree.ElementTree as ET
 import os
 
 class CanBridge:
     def __init__(self):
         self.load_settings()
-        self.config = get_robot_conf(self.robot_name)
+        self.robot_config = get_robot_conf(self.robot_name)
         self.bus = can.Bus(channel='can0', bustype='socketcan', bitrate=500000)
+
+        if self.robot_name == "ROOK":
+            self.can_message = RookMessage
+            #TODO: Add Probot and MTGR
+        else:
+            raise ValueError(f"Unknown robot: {self.robot_name}")
+
 
     def read_one_frame(self, timeout=0.0):
         """
@@ -33,19 +41,10 @@ class CanBridge:
         except can.CanError as e:
             print(f"CAN send error: {e}")
 
-    def send_motor_cmd_rook(self, left_velocity, right_velocity):
-        left_id  = self.config.get('CMD_MOTOR_LEFT')
-        right_id = self.config.get('CMD_MOTOR_RIGHT')
-
-        # Example data format from your old code
-        left_data  = [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-        right_data = [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-        
-        left_data[1], left_data[2] = self.set_rook_data(left_velocity)
-        right_data[1], right_data[2] = self.set_rook_data(right_velocity)
-
-        self._send_can_message(left_id, left_data)
-        self._send_can_message(right_id, right_data)
+    def send_velocity_command(self, left_velocity, right_velocity):
+        msg_left, msg_right = self.can_message.set_velocity_message(left_velocity, right_velocity)
+        self._send_can_message(msg_left[0], msg_left[1])
+        self._send_can_message(msg_right[0], msg_right[1])
 
     # ----------------------------------------------------------------
     # PROBOT: Speed Control Command
@@ -55,8 +54,8 @@ class CanBridge:
         2B D9 33 00 <speed> (4 bytes) => total 8 bytes
         speed range: -1000..1000
         """
-        left_id  = self.config.get('MOTOR_LEFT_SPEED_CMD')
-        right_id = self.config.get('MOTOR_RIGHT_SPEED_CMD')
+        left_id  = self.robot_config.get('MOTOR_LEFT_SPEED_CMD')
+        right_id = self.robot_config.get('MOTOR_RIGHT_SPEED_CMD')
 
         left_data = bytearray([0x2B, 0xD9, 0x33, 0x00]) + int.to_bytes(left_speed, 4, 'little', signed=True)
         right_data = bytearray([0x2B, 0xD9, 0x33, 0x00]) + int.to_bytes(right_speed, 4, 'little', signed=True)
@@ -69,8 +68,8 @@ class CanBridge:
         2B D6 33 00 <count> => total 8 bytes
         Must be sent every 100ms
         """
-        left_id  = self.config.get('MOTOR_LEFT_HEARTBEAT_CMD')
-        right_id = self.config.get('MOTOR_RIGHT_HEARTBEAT_CMD')
+        left_id  = self.robot_config.get('MOTOR_LEFT_HEARTBEAT_CMD')
+        right_id = self.robot_config.get('MOTOR_RIGHT_HEARTBEAT_CMD')
 
         left_data  = bytearray([0x2B, 0xD6, 0x33, 0x00]) + int.to_bytes(left_count, 4, 'little', signed=False)
         right_data = bytearray([0x2B, 0xD6, 0x33, 0x00]) + int.to_bytes(right_count, 4, 'little', signed=False)
