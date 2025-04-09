@@ -53,10 +53,13 @@ class RookMessage(CanMessage):
         self.dat_data(frame[4:])
 
     def _convert_velocity(self, velocity: int) -> bytes:
-        """Helper to convert velocity to Rook-specific format."""
-        if velocity < 0:
-            return (~abs(velocity) & 0xFF).to_bytes(1, 'big') + b'\xFF'
-        return velocity.to_bytes(1, 'big') + b'\x00'
+        """
+        Converts a speed value in range [-1000, 1000] to 2-byte signed integer in little-endian.
+        """
+        if not -1000 <= velocity <= 1000:
+            raise ValueError("Speed must be between -1000 and 1000")
+
+        return velocity.to_bytes(2, byteorder='little', signed=True)
     
     def _parse_velocity(self, data: bytes) -> int:
         """Helper to parse Rook-specific velocity format."""

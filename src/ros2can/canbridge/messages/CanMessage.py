@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from can_parser import parse_frame
+#from can_parser import parse_frame
 class CanMessage(ABC):
     """
     Abstract base class for CAN messages.
@@ -16,40 +16,40 @@ class CanMessage(ABC):
         """
         pass
 
-    @abstractmethod
-    def set_heartbeat_message(self) -> bytes:
-        """
-        Convert the heartbeat message to bytes.
-        """
-        pass
+    # @abstractmethod
+    # def set_heartbeat_message(self) -> bytes:
+    #     """
+    #     Convert the heartbeat message to bytes.
+    #     """
+    #     pass
+
+    # @abstractmethod
+    # def set_ir_led_message(self, set_led: bool) -> bytes:
+    #     """
+    #     Convert the IR LED message to bytes.
+    #     """
+    #     pass
+
+    # @abstractmethod
+    # def set_white_led_message(self, set_led: bool) -> bytes:
+    #     """
+    #     Convert the white LED message to bytes.
+    #     """
+    #     pass
+
+    # @abstractmethod
+    # def get_data(self, data: bytes):
+    #     """
+    #     Convert bytes to the message.
+    #     """
+    #     pass
 
     @abstractmethod
-    def set_ir_led_message(self, set_led: bool) -> bytes:
-        """
-        Convert the IR LED message to bytes.
-        """
-        pass
-
-    @abstractmethod
-    def set_white_led_message(self, set_led: bool) -> bytes:
-        """
-        Convert the white LED message to bytes.
-        """
-        pass
-
-    @abstractmethod
-    def get_data(self, data: bytes):
-        """
-        Convert bytes to the message.
-        """
-        pass
-
-    @staticmethod
     def parse_frame(self, frame: bytes):
         """
         Parse a CAN frame.
         """
-        return parse_frame(frame)
+        pass
 
     @staticmethod
     def send_message(self, id, bus, msg):
