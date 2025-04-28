@@ -40,6 +40,7 @@ run_docker_cmd="docker run \
   python3 -m pip install --upgrade pip && \
   pip install black==21.12b0 uvloop==0.17.0 && \
   pip install --upgrade typing-extensions && \
+  rm -rf src/rook_description/ src/rook_canopen &&\
   /bin/bash\""
   
 echo -e "${CYAN_BOLD}$run_docker_cmd${NC}"

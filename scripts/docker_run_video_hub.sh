@@ -46,6 +46,7 @@ run_docker_cmd="docker run \
     sudo apt update && \
     sudo apt install -y python3-gi python3-gi-cairo && \
     echo -e \"${GREEN}Environment is ready!${NC}\" && \
+    rm -rf src/rook_description/ src/rook_canopen &&\
     exec bash'"
   
 # Print and execute the Docker run command
