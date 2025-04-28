@@ -1,4 +1,4 @@
-from .CanMessage import CanMessage
+from .ICanMessage import CanMessage
 from enum import Enum
 
 class RookMessageIDs(Enum):

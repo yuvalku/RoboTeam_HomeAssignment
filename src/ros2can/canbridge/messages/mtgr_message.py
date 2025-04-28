@@ -1,11 +1,11 @@
-from CanMessage  import CanMessage
+from ros2can.canbridge.messages.ICanMessage  import CanMessage
 from enum import Enum
 from typing import Tuple
 
 # Constants for flipper directions
-FLIPPER_CW = 1    # Clockwise
-FLIPPER_CCW = -1  # Counterclockwise
-FLIPPER_NONE = 0  # No movement
+CW = 1    # Clockwise
+CCW = -1  # Counterclockwise
+STDBY = 0  # No movement
 
 class MtgrMessageIDs(Enum):
     """
@@ -34,9 +34,6 @@ class MtgrMessage(CanMessage):
         self.left_flipper_angle = 0
         self.right_flipper_angle = 0
 
-        
-        
-
     def set_velocity_message(self, left_velocity: int, right_velocity: int) -> Tuple[
                                                                     Tuple[int, bytes], Tuple[int, bytes]]:
         """
@@ -48,49 +45,50 @@ class MtgrMessage(CanMessage):
         if len(left_data) > 8 or len(right_data) > 8:
             raise ValueError("Data length exceeds 8 bytes for a CAN message.")
     
-        msg_left = (self.motor_cmd_id.value,
+        msg_left = self._build_can_frame(self.motor_cmd_id.value,
                     bytes([0x06, self.motor_left_cmd_id.value & 0xFF]) + left_data
         )
 
-        msg_right = (self.motor_cmd_id.value,
+        msg_right = self._build_can_frame(self.motor_cmd_id.value,
                     bytes([0x06, self.motor_right_cmd_id.value & 0xFF]) + right_data
         )
 
         return msg_left, msg_right
     
-    def set_flipper_rotation_message(self, left_move: int = FLIPPER_NONE, right_move: int = FLIPPER_NONE, is_sync: bool = False) -> bytes:
+    def set_flipper_rotation_message(self, left_move: int, right_move: int, is_sync: bool) -> bytes:
         """
         Create a flipper rotation message for the MTGR robot.
         """
-        valid_moves = {FLIPPER_CW, FLIPPER_CCW, FLIPPER_NONE}
+        valid_moves = {CW, CCW, STDBY}
         if left_move not in valid_moves or right_move not in valid_moves:
-            raise ValueError("Invalid flipper direction. Must be FLIPPER_CW, FLIPPER_CCW, or FLIPPER_NONE.")
+            raise ValueError("Invalid flipper direction. Must be CW, CCW, or STDBY.")
         if is_sync:
             right_move = left_move
-            if left_move == FLIPPER_NONE:
+            if left_move == STDBY:
                 left_byte = 0x00
                 right_byte = 0x00
                 self._sync_flippers()
             else:
-                left_byte = 0xA6 if left_move == FLIPPER_CW else 0x59
+                left_byte = 0xA6 if left_move == CW else 0x59
                 right_byte = left_byte
         else:
-            left_byte = 0xA6 if left_move == FLIPPER_CW else (0x59 if left_move == FLIPPER_CCW else 0x00)
-            right_byte = 0x59 if right_move == FLIPPER_CW else (0xA6 if right_move == FLIPPER_CCW else 0x00)
+            left_byte = 0xA6 if left_move == CW else (0x59 if left_move == CCW else 0x00)
+            right_byte = 0x59 if right_move == CW else (0xA6 if right_move == CCW else 0x00)
         
         data = bytes([0x01, left_byte, right_byte])
-        return self.flipper_cmd_id.value, data
+        return self._build_can_frame(self.flipper_cmd_id.value, data)
     
+    def set_tilt_camera_message(self, direction: int):
+        #TODO: add tilt camera function
+        pass
+
+    def set_manip_link_manual_message(self, direction, speed):
+        #TODO: add manipulator manual control method
+        pass
     
-    def _sync_flipper(self):
-        mirrored_right = (360 - self.right_flipper_angle) % 360
-        raw_mid = (self.left_flipper_angle + mirrored_right) // 2
-
-        midpoint_left = int(raw_mid) % 360
-
-        mirrored_right = (360 - midpoint_left) % 360
-        #TODO: Add logic to send the midpoint_left and mirrored_right to the flippers
-        return midpoint_left, mirrored_right
+    def set_manip_link_to_angle_message(self, angle, speed):
+        #TODO: add manupulator move to angle method
+        pass
 
     def parse_data(self, can_id: int, data: bytes):
         """
@@ -112,4 +110,18 @@ class MtgrMessage(CanMessage):
             raise ValueError("Speed must be between -1000 and 1000")
 
         return velocity.to_bytes(2, byteorder='little', signed=True)
+    
+    def _sync_flipper(self):
+        mirrored_right = (360 - self.right_flipper_angle) % 360
+        raw_mid = (self.left_flipper_angle + mirrored_right) // 2
 
+        midpoint_left = int(raw_mid) % 360
+
+        mirrored_right = (360 - midpoint_left) % 360
+        #TODO: Add logic to send the midpoint_left and mirrored_right to the flippers
+        return midpoint_left, mirrored_right
+
+    def _build_can_frame(self, cmd_id, payload: bytes) -> Tuple[int, bytes]:
+        if len(payload) > 8:
+            raise ValueError("Payload too large for CAN frame (max 8 bytes)")
+        return (cmd_id.value, payload)

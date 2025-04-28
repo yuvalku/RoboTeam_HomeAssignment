@@ -16,6 +16,19 @@ class CanMessage(ABC):
         """
         pass
 
+    @abstractmethod
+    def set_manip_link_manual_message(self, direction: int, speed: int) -> bytes:
+        """
+        Convert the manual manipulator link control message to bytes
+        """
+        pass
+
+    @abstractmethod
+    def set_manip_link_to_angle_message(self, angle: int, speed: int) -> bytes:
+        """
+        Convert the set angle of manipulator link message to bytes
+        """
+        pass
     # @abstractmethod
     # def set_heartbeat_message(self) -> bytes:
     #     """
@@ -50,17 +63,6 @@ class CanMessage(ABC):
         Parse a CAN frame.
         """
         pass
-
-    @staticmethod
-    def send_message(self, id, bus, msg):
-        """
-        Send the CAN message using the provided CAN bus.
-        """
-        try:
-            bus.send(msg)
-            print(f"Message sent: ID={id}, Data={msg.data}")
-        except Exception as e:
-            print(f"Failed to send message: {e}")
 
     @staticmethod
     def get_message(bus, timeout=1.0):
