@@ -1,5 +1,5 @@
-from mtgrMessage import MtgrMessage, MtgrMessageIDs
-from mtgrMessage import MtgrMessage, FLIPPER_CW, FLIPPER_CCW, FLIPPER_NONE
+from ros2can.canbridge.messages.mtgr_message import MtgrMessage, MtgrMessageIDs
+from ros2can.canbridge.messages.mtgr_message import MtgrMessage, FLIPPER_CW, FLIPPER_CCW, FLIPPER_NONE
 import can
 import time
 

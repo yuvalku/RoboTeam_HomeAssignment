@@ -19,11 +19,11 @@ class DriveHub(Node):
     def create_subscriptions(self):
         self.create_subscription(Twist, 'cmd_vel_input', self.cmd_vel_callback, 10)
         self.create_subscription(Imu, '/imu', self.imu_callback, 10)
-        self.create_subscription(Twist, 'mpc_output', self.on_mpc_output, 10)
+        #self.create_subscription(Twist, 'mpc_output', self.on_mpc_output, 10)
         self.create_subscription(CanFrame, 'can_status', self.get_can_status, 10)
 
     def create_publishers(self):
-        self.mpc_input_publisher = self.create_publisher(MpcInput, 'mpc_input', 10)
+        #self.mpc_input_publisher = self.create_publisher(MpcInput, 'mpc_input', 10)
         self.steer_publisher = self.create_publisher(Twist, 'skid_vel_cmd', 10)
 
     def cmd_vel_callback(self, msg: Twist):
