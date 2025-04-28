@@ -1,4 +1,2 @@
 int16 left_motor_velocity
-int8 left_motor_direction
 int16 right_motor_velocity
-int8 right_motor_direction

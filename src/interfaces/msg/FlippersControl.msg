@@ -1,0 +1,3 @@
+int8 direction_left
+int8 direction_right
+bool is_sync
