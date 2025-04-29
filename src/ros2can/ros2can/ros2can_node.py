@@ -1,7 +1,8 @@
 import rclpy
 from rclpy.node import Node
-from interfaces.msg import MotorsVelocity, FlippersControl
+from interfaces.msg import MotorsVelocity, FlippersControl, ManipulatorControl
 from canbridge.can_bridge import CanBridge
+from canbridge.can_ids import CanMessageIDs
 
 class Ros2Can(Node):
     def __init__(self):
@@ -12,6 +13,8 @@ class Ros2Can(Node):
         
         if self.robot_name == 'MTGR':
             self.create_subscription(FlippersControl, 'flippers', self.on_flippers, 10)
+        if self.robot_name == 'TIGR' or self.robot_name == 'MTGR':
+            self.create_subscription(ManipulatorControl, 'manipulator', self.on_manipulator, 10)
 
         self.get_logger().info(f"ROS2CAN Node started for robot: {self.bridge.robot_name}")
 
@@ -30,7 +33,29 @@ class Ros2Can(Node):
         self.get_logger().info(f"left direction: {msg.direction_left}, \
                                 right velocity: {msg.direction_right}, \
                                 flippers sync: {msg.is_sync}")
- 
+    
+    def on_manipulator(self, msg: ManipulatorControl):
+        if msg.joint_name not in {"pan", "shoulder", "elbow1", "elbow2", "wrist", "gripper"}:
+            self.get_logger().error(f"Invalid joint name: {msg.joint_name}")
+            return
+        if msg.joint_name == "pan":
+            joint_id = CanMessageIDs.JOINT_PAN
+        elif msg.joint_name == "shoulder":
+            joint_id = CanMessageIDs.JOINT_SHOULDER
+        elif msg.joint_name == "elbow1":
+            joint_id = CanMessageIDs.JOINT_ELBOW1
+        elif msg.joint_name == "elbow2":
+            joint_id = CanMessageIDs.JOINT_ELBOW2
+        elif msg.joint_name == "wrist":
+            joint_id = CanMessageIDs.JOINT_WRIST
+        elif msg.joint_name == "gripper":
+            joint_id = CanMessageIDs.JOINT_GRIPPER
+
+        if msg.is_manual:
+            self.bridge.send_joint_speed_command(joint_id, msg.joint_speed)
+        else:
+            #TODO: add manipulator move to angle method
+            pass
 
 def main(args=None):
     rclpy.init(args=args)

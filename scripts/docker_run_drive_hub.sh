@@ -31,6 +31,7 @@ run_docker_cmd="docker run \
   --cap-add=CAP_SYS_RESOURCE \
   -e ROS_DOMAIN_ID=1 \
   -e ROS_LOCALHOST_ONLY=0 \
+  -e RMW_IMPLEMENTATION=rmw_fastdds_cpp \
   -e PYTHONOPTIMIZE=2 \
   -e DISPLAY=$DISPLAY \
   -e QT_X11_NO_MITSHM=1 \

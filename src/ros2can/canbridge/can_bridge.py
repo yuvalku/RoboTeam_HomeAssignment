@@ -2,8 +2,9 @@ import can
 from typing import Tuple
 from .can_config import get_robot_conf
 from .can_parser import parse_frame
-from .messages import rook_message, mtgr_message
+from .messages import rook_message, mtgr_message, tiger_message
 import xml.etree.ElementTree as ET
+
 
 class CanBridge:
     def __init__(self):
@@ -15,7 +16,8 @@ class CanBridge:
             self.can_message = rook_message.RookMessage
         elif self.robot_name == "MTGR":
             self.can_message = mtgr_message.MtgrMessage
-        #TODO: Add Probot
+        elif self.robot_name == "TIGR":
+            self.can_message = tiger_message.TigrMessage
         else:
             raise ValueError(f"Unknown robot: {self.robot_name}")
 
@@ -50,7 +52,24 @@ class CanBridge:
         id, flippers_data = self.can_message.set_flipper_rotation_message(left_flipper_direction, right_flipper_direction, sync)
         self._send_can_message(id, flippers_data)
 
+# ----------------------------------------------------------------
+# Tiger Specific Commands
+    def send_tilt_camera_command(self, direction: int):
+        """
+        :param direction: 1 for up, -1 for down.
+        """
+        id, data = self.can_message.set_tilt_camera_message(direction)
+        self._send_can_message(id, data)
 
+    def send_joint_speed_command(self, joint_id: int, speed: int):
+        """
+        :param joint_id: TigrManipulatorMessageIDs enum value.
+        :param speed: Speed value for the joint.
+        """
+        id, data = self.can_message.set_joint_speed_message(joint_id, speed)
+        self._send_can_message(id, data)
+
+        
 # ----------------------------------------------------------------
 # Private methods 
     def _load_settings(self):
