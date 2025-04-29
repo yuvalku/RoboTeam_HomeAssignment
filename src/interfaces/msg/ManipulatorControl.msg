@@ -1,0 +1,4 @@
+string joint_name
+int32 joint_speed
+int32 joint_position
+bool is_manual
