@@ -66,10 +66,11 @@ class CanBridge:
         :param joint_id: TigrManipulatorMessageIDs enum value.
         :param speed: Speed value for the joint.
         """
-        id, data = self.can_message.set_joint_speed_message(joint_id, speed)
-        self._send_can_message(id, data)
+        data = self.can_message.set_joint_speed_message(joint_id, speed)
+        print(joint_id, data, id)
+        self._send_can_message(joint_id, data)
 
-        
+
 # ----------------------------------------------------------------
 # Private methods 
     def _load_settings(self):

@@ -1,4 +1,4 @@
-from ros2can.canbridge.messages.ICanMessage  import CanMessage
+from .ICanMessage  import CanMessage
 from enum import Enum
 from typing import Tuple
 

@@ -57,10 +57,10 @@ def test_tigr_joint_speed_msg():
     ]
 
     while True:
-        msg_id, msg_data = tigr_message.set_joint_speed_message(TigrManipulatorMessageIDs.JOINT_PAN, speed=-1000)
+        msg_id, msg_data = tigr_message.set_joint_speed_message(TigrManipulatorMessageIDs.JOINT_PAN, speed=-200)
         can_msg = can.Message(arbitration_id=msg_id, data=msg_data, is_extended_id=False)
         bus.send(can_msg)
-        print(f"Sent speed command to {TigrManipulatorMessageIDs.JOINT_ELBOW1.name}")
+        print(f"Sent speed command to {TigrManipulatorMessageIDs.JOINT_PAN.name}")
 
         time.sleep(0.01)  # Send every second
 

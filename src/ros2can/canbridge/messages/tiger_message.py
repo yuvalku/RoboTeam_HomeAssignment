@@ -1,4 +1,4 @@
-from ICanMessage  import CanMessage
+from .ICanMessage  import CanMessage
 from enum import Enum
 from typing import Tuple
 
@@ -73,7 +73,7 @@ class TigrMessage(CanMessage):
 
         return TigrManipulatorMessageIDs.TILT_CAM.value, payload
     
-    def set_joint_speed_message(self, joint: TigrManipulatorMessageIDs, speed: int) -> Tuple[int, bytes]:
+    def set_joint_speed_message(self, speed) -> Tuple[int, bytes]:
         """
         Build a CAN message to set the speed of a manipulator joint.
 
@@ -84,7 +84,7 @@ class TigrMessage(CanMessage):
         
         speed_bytes = speed.to_bytes(2, byteorder='little', signed=True)
         payload = bytes([0x06]) + speed_bytes
-        return joint.value, payload
+        return payload
     
     def set_joint_abs_position_message(self, joint:TigrManipulatorMessageIDs, position: int, direction: int) -> Tuple[int, bytes]:
         """

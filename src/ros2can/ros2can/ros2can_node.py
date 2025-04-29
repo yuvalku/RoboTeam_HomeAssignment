@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from interfaces.msg import MotorsVelocity, FlippersControl, ManipulatorControl
 from canbridge.can_bridge import CanBridge
-from canbridge.can_ids import CanMessageIDs
+from canbridge import can_ids
 
 class Ros2Can(Node):
     def __init__(self):
@@ -39,20 +39,21 @@ class Ros2Can(Node):
             self.get_logger().error(f"Invalid joint name: {msg.joint_name}")
             return
         if msg.joint_name == "pan":
-            joint_id = CanMessageIDs.JOINT_PAN
+            joint_id = can_ids.TigrCANIDs.JOINT_PAN
         elif msg.joint_name == "shoulder":
-            joint_id = CanMessageIDs.JOINT_SHOULDER
+            joint_id = can_ids.TigrCANIDs.JOINT_SHOULDER
         elif msg.joint_name == "elbow1":
-            joint_id = CanMessageIDs.JOINT_ELBOW1
+            joint_id = can_ids.TigrCANIDs.JOINT_ELBOW1
         elif msg.joint_name == "elbow2":
-            joint_id = CanMessageIDs.JOINT_ELBOW2
+            joint_id = can_ids.TigrCANIDs.JOINT_ELBOW2
         elif msg.joint_name == "wrist":
-            joint_id = CanMessageIDs.JOINT_WRIST
+            joint_id = can_ids.TigrCANIDs.JOINT_WRIST
         elif msg.joint_name == "gripper":
-            joint_id = CanMessageIDs.JOINT_GRIPPER
+            joint_id = can_ids.TigrCANIDs.JOINT_GRIPPER
 
         if msg.is_manual:
-            self.bridge.send_joint_speed_command(joint_id, msg.joint_speed)
+            print (joint_id.value, msg.joint_speed)
+            self.bridge.send_joint_speed_command(joint_id.value, msg.joint_speed)
         else:
             #TODO: add manipulator move to angle method
             pass
