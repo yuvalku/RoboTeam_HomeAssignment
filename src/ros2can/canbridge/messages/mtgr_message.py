@@ -34,7 +34,7 @@ class MtgrMessage(CanMessage):
         self.left_flipper_angle = 0
         self.right_flipper_angle = 0
 
-    def set_velocity_message(self, left_velocity: int, right_velocity: int) -> Tuple[
+    def set_velocity_message(self, left_velocity: int = 0, right_velocity: int = 0) -> Tuple[
                                                                     Tuple[int, bytes], Tuple[int, bytes]]:
         """
         Convert the velocity message to bytes for the MTGR robot.

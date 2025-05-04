@@ -15,7 +15,13 @@ class CanMessage(ABC):
         Convert the velocity message to bytes.
         """
         pass
-
+    
+    @abstractmethod
+    def set_joint_speed_message(self, joint_id: int, speed: int) -> bytes:
+        """
+        Convert the joint speed message to bytes.
+        """
+        pass
     
     # @abstractmethod
     # def set_heartbeat_message(self) -> bytes:

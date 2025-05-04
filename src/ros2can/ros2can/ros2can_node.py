@@ -23,10 +23,11 @@ class Ros2Can(Node):
         Called every time a MotorsVelocity message is published.
         We'll pass the fields to the single 'send_speed_cmd' method in CanBridge.
         """
+        self.get_logger().info(f"Received MotorsVelocity: {msg}")
         left_speed = msg.left_motor_velocity
         right_speed = msg.right_motor_velocity
-        self.bridge.send_velocity_command(left_speed, right_speed)
         self.get_logger().info(f"left velocity: {left_speed}, right velocity: {right_speed}")
+        self.bridge.send_velocity_command(left_speed, right_speed)
 
     def on_flippers(self, msg: FlippersControl):
         self.bridge.flippers_control(msg.direction_left, msg.direction_right, msg.is_sync)

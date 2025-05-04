@@ -13,11 +13,11 @@ class CanBridge:
         self.bus = can.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
         if self.robot_name == "ROOK":
-            self.can_message = rook_message.RookMessage
+            self.can_message = rook_message.RookMessage()
         elif self.robot_name == "MTGR":
-            self.can_message = mtgr_message.MtgrMessage
+            self.can_message = mtgr_message.MtgrMessage()
         elif self.robot_name == "TIGR":
-            self.can_message = tiger_message.TigrMessage
+            self.can_message = tiger_message.TigrMessage()
         else:
             raise ValueError(f"Unknown robot: {self.robot_name}")
 
@@ -42,6 +42,7 @@ class CanBridge:
 # ----------------------------------------------------------------
 # All Platforms Speed Control Command
     def send_velocity_command(self, left_velocity, right_velocity):
+        print(f"L velocity: {left_velocity}, R velocity: {right_velocity}")
         msg_left, msg_right = self.can_message.set_velocity_message(left_velocity, right_velocity)
         self._send_can_message(msg_left[0], msg_left[1])
         self._send_can_message(msg_right[0], msg_right[1])
@@ -66,7 +67,7 @@ class CanBridge:
         :param joint_id: TigrManipulatorMessageIDs enum value.
         :param speed: Speed value for the joint.
         """
-        data = self.can_message.set_joint_speed_message(joint_id, speed)
+        data = self.can_message.set_joint_speed_message(speed)
         print(joint_id, data, id)
         self._send_can_message(joint_id, data)
 
