@@ -12,8 +12,13 @@ class CameraManager:
                 "rtsp://192.168.125.139:554/av0_": "LEFT",
                 "rtsp://192.168.125.140:554/av0_": "FRONT_RIGHT",
                 "rtsp://192.168.125.141:554/av0_": "FRONT_LEFT",
-            }
+            },
 #------------------------------------------------------------#
+            "TIGR_907": {
+                "rtsp://192.168.29.89:554/av0_0": "GRIPPER",
+                "rtsp://192.168.29.187:554/av0_0v": "FRONT",
+                "rtsp://192.168.29.227:554/av0_0": "REAR",
+            }
         }
         if robot.upper() not in self.camera_lists:
             raise ValueError(f"Unknown robot name: {robot}")
