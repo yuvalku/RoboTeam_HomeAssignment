@@ -24,7 +24,7 @@ class SkidSteerNode(Node):
 
         separation = motor_separation / (2 if num_motors == 2 else 4)
 
-        if abs(linear_velocity) < 50.0 and abs(angular_velocity) > 450.0:
+        if abs(linear_velocity) < 100.0 and abs(angular_velocity) > 450.0:
             # Pivot in place
             left_velocity = 0.5 * angular_velocity
             right_velocity = -0.5 * angular_velocity
