@@ -1,0 +1,58 @@
+version: '3.9'
+services:
+  drive_hub:
+    image: drive_hub
+    network_mode: host
+    ipc: host
+    pid: host
+    privileged: true
+    stdin_open: true
+    tty: true
+    environment:
+      - ROS_DOMAIN_ID=1
+      - ROS_LOCALHOST_ONLY=0
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - XDG_RUNTIME_DIR=/tmp/xdg
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+    volumes:
+      - ./:/workspaces/ros2_workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/argus_socket:/tmp/argus_socket
+    command: /bin/bash -c "
+      pip install python-can &&
+      python3 -m pip install --upgrade pip &&
+      pip install black==21.12b0 uvloop==0.17.0 &&
+      pip install --upgrade typing-extensions &&
+      rm -rf src/rook_description/ src/rook_canopen &&
+      source install/setup.bash &&
+      ros2 launch launcher drive_hub.launch.py &&
+      exec bash "
+
+  video_hub:
+    image: video_hub
+    network_mode: host
+    ipc: host
+    pid: host
+    privileged: true
+    stdin_open: true
+    tty: true
+    environment:
+      - ROS_DOMAIN_ID=1
+      - ROS_LOCALHOST_ONLY=0
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - XDG_RUNTIME_DIR=/tmp/xdg
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+    volumes:
+      - ./:/workspaces/ros2_workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/argus_socket:/tmp/argus_socket
+    command: /bin/bash -c "
+      pip3 install 'numpy<2' &&
+      sudo apt update &&
+      sudo apt install -y python3-gi python3-gi-cairo &&
+      rm -rf src/rook_description/ src/rook_canopen &&
+      source install/setup.bash &&
+      ros2 launch launcher video_hub.launch.py &&
+      exec bash "

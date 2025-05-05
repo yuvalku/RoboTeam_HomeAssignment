@@ -8,7 +8,7 @@ def generate_launch_description():
     drive_hub_node = Node(
         package='drive_hub',
         name='drive_hub_node',
-        executable='drive_hub',
+        executable='drive_hub_node',
         output={'both': 'log'},
     )
 
