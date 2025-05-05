@@ -33,6 +33,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/RobotStatus.msg"
   "msg/Image420.msg"
   "srv/GetCameraIp.srv"
+  "msg/FlippersControl.msg"
+  "msg/ManipulatorControl.msg"
   DEPENDENCIES geometry_msgs sensor_msgs std_msgs
 )
 

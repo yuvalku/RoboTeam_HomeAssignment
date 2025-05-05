@@ -23,14 +23,24 @@ class SkidSteerNode(Node):
             raise ValueError(f"Unsupported number of motors: {num_motors}")
 
         separation = motor_separation / (2 if num_motors == 2 else 4)
-        left_velocity = linear_velocity - (angular_velocity * separation / 2)
-        right_velocity = linear_velocity + (angular_velocity * separation / 2)
-        return int(left_velocity), int(right_velocity)
+
+        if abs(linear_velocity) < 100.0 and abs(angular_velocity) > 450.0:
+            # Pivot in place
+            left_velocity = 0.5 * angular_velocity
+            right_velocity = -0.5 * angular_velocity
+
+        else:
+            # Normal skid-steer mixing
+            right_velocity = linear_velocity - (angular_velocity * separation / 2)
+            left_velocity = linear_velocity + (angular_velocity * separation / 2)
+
+        return int(left_velocity), int(-right_velocity)
     
     
     def on_cmd_vel(self, msg: Twist):
         motors_velocity = MotorsVelocity()
         motors_velocity.left_motor_velocity, motors_velocity.right_motor_velocity = self.calculate_motor_velocities(msg.linear.x, msg.angular.z)
+        self.get_logger().info(f"Left motor velocity: {motors_velocity.left_motor_velocity}, Right motor velocity: {motors_velocity.right_motor_velocity}")
         # linear_velocity = int(msg.linear.x)
         # motors_velocity.left_motor_velocity = motors_velocity.right_motor_velocity = linear_velocity
         

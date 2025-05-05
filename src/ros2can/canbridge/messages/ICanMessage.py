@@ -15,20 +15,14 @@ class CanMessage(ABC):
         Convert the velocity message to bytes.
         """
         pass
-
+    
     @abstractmethod
-    def set_manip_link_manual_message(self, direction: int, speed: int) -> bytes:
+    def set_joint_speed_message(self, joint_id: int, speed: int) -> bytes:
         """
-        Convert the manual manipulator link control message to bytes
+        Convert the joint speed message to bytes.
         """
         pass
-
-    @abstractmethod
-    def set_manip_link_to_angle_message(self, angle: int, speed: int) -> bytes:
-        """
-        Convert the set angle of manipulator link message to bytes
-        """
-        pass
+    
     # @abstractmethod
     # def set_heartbeat_message(self) -> bytes:
     #     """
@@ -57,12 +51,12 @@ class CanMessage(ABC):
     #     """
     #     pass
 
-    @abstractmethod
-    def parse_frame(self, frame: bytes):
-        """
-        Parse a CAN frame.
-        """
-        pass
+    # @abstractmethod
+    # def parse_frame(self, frame: bytes):
+    #     """
+    #     Parse a CAN frame.
+    #     """
+    #     pass
 
     @staticmethod
     def get_message(bus, timeout=1.0):

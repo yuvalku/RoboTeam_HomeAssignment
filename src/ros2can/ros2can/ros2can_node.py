@@ -1,7 +1,8 @@
 import rclpy
 from rclpy.node import Node
-from interfaces.msg import MotorsVelocity, FlippersControl
+from interfaces.msg import MotorsVelocity, FlippersControl, ManipulatorControl
 from canbridge.can_bridge import CanBridge
+from canbridge import can_ids
 
 class Ros2Can(Node):
     def __init__(self):
@@ -12,6 +13,8 @@ class Ros2Can(Node):
         
         if self.robot_name == 'MTGR':
             self.create_subscription(FlippersControl, 'flippers', self.on_flippers, 10)
+        if self.robot_name == 'TIGR' or self.robot_name == 'MTGR':
+            self.create_subscription(ManipulatorControl, 'manipulator', self.on_manipulator, 10)
 
         self.get_logger().info(f"ROS2CAN Node started for robot: {self.bridge.robot_name}")
 
@@ -20,17 +23,41 @@ class Ros2Can(Node):
         Called every time a MotorsVelocity message is published.
         We'll pass the fields to the single 'send_speed_cmd' method in CanBridge.
         """
+        self.get_logger().info(f"Received MotorsVelocity: {msg}")
         left_speed = msg.left_motor_velocity
         right_speed = msg.right_motor_velocity
-        self.bridge.send_velocity_command(left_speed, right_speed)
         self.get_logger().info(f"left velocity: {left_speed}, right velocity: {right_speed}")
+        self.bridge.send_velocity_command(left_speed, right_speed)
 
     def on_flippers(self, msg: FlippersControl):
         self.bridge.flippers_control(msg.direction_left, msg.direction_right, msg.is_sync)
         self.get_logger().info(f"left direction: {msg.direction_left}, \
                                 right velocity: {msg.direction_right}, \
                                 flippers sync: {msg.is_sync}")
- 
+    
+    def on_manipulator(self, msg: ManipulatorControl):
+        if msg.joint_name not in {"pan", "shoulder", "elbow1", "elbow2", "wrist", "gripper"}:
+            self.get_logger().error(f"Invalid joint name: {msg.joint_name}")
+            return
+        if msg.joint_name == "pan":
+            joint_id = can_ids.TigrCANIDs.JOINT_PAN
+        elif msg.joint_name == "shoulder":
+            joint_id = can_ids.TigrCANIDs.JOINT_SHOULDER
+        elif msg.joint_name == "elbow1":
+            joint_id = can_ids.TigrCANIDs.JOINT_ELBOW1
+        elif msg.joint_name == "elbow2":
+            joint_id = can_ids.TigrCANIDs.JOINT_ELBOW2
+        elif msg.joint_name == "wrist":
+            joint_id = can_ids.TigrCANIDs.JOINT_WRIST
+        elif msg.joint_name == "gripper":
+            joint_id = can_ids.TigrCANIDs.JOINT_GRIPPER
+
+        if msg.is_manual:
+            print (joint_id.value, msg.joint_speed)
+            self.bridge.send_joint_speed_command(joint_id.value, msg.joint_speed)
+        else:
+            #TODO: add manipulator move to angle method
+            pass
 
 def main(args=None):
     rclpy.init(args=args)

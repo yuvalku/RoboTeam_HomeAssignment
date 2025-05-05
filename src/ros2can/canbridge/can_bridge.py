@@ -2,8 +2,9 @@ import can
 from typing import Tuple
 from .can_config import get_robot_conf
 from .can_parser import parse_frame
-from .messages import rook_message, mtgr_message
+from .messages import rook_message, mtgr_message, tiger_message
 import xml.etree.ElementTree as ET
+
 
 class CanBridge:
     def __init__(self):
@@ -12,10 +13,11 @@ class CanBridge:
         self.bus = can.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
         if self.robot_name == "ROOK":
-            self.can_message = rook_message.RookMessage
+            self.can_message = rook_message.RookMessage()
         elif self.robot_name == "MTGR":
-            self.can_message = mtgr_message.MtgrMessage
-        #TODO: Add Probot
+            self.can_message = mtgr_message.MtgrMessage()
+        elif self.robot_name == "TIGR":
+            self.can_message = tiger_message.TigrMessage()
         else:
             raise ValueError(f"Unknown robot: {self.robot_name}")
 
@@ -40,6 +42,7 @@ class CanBridge:
 # ----------------------------------------------------------------
 # All Platforms Speed Control Command
     def send_velocity_command(self, left_velocity, right_velocity):
+        print(f"L velocity: {left_velocity}, R velocity: {right_velocity}")
         msg_left, msg_right = self.can_message.set_velocity_message(left_velocity, right_velocity)
         self._send_can_message(msg_left[0], msg_left[1])
         self._send_can_message(msg_right[0], msg_right[1])
@@ -49,6 +52,24 @@ class CanBridge:
     def flippers_control(self, left_flipper_direction: int, right_flipper_direction: int, sync: bool):
         id, flippers_data = self.can_message.set_flipper_rotation_message(left_flipper_direction, right_flipper_direction, sync)
         self._send_can_message(id, flippers_data)
+
+# ----------------------------------------------------------------
+# Tiger Specific Commands
+    def send_tilt_camera_command(self, direction: int):
+        """
+        :param direction: 1 for up, -1 for down.
+        """
+        id, data = self.can_message.set_tilt_camera_message(direction)
+        self._send_can_message(id, data)
+
+    def send_joint_speed_command(self, joint_id: int, speed: int):
+        """
+        :param joint_id: TigrManipulatorMessageIDs enum value.
+        :param speed: Speed value for the joint.
+        """
+        data = self.can_message.set_joint_speed_message(speed)
+        print(joint_id, data, id)
+        self._send_can_message(joint_id, data)
 
 
 # ----------------------------------------------------------------
