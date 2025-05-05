@@ -110,7 +110,7 @@ class PSJoystickController:
 
         linear_velocity = -self.joystick.get_axis(1) * 500.0
         angular_velocity = self.joystick.get_axis(0) * 500.0
-        if abs(linear_velocity) < 30.0 and abs(angular_velocity) < 30.0:
+        if abs(linear_velocity) < 30.0 and abs(angular_velocity) < 50.0:
             linear_velocity = 0.0
             angular_velocity = 0.0
         self.ros2interface.publish_velocity(linear_x=linear_velocity, angular_z=angular_velocity)
