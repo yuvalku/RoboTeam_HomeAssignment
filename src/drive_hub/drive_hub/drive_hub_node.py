@@ -23,12 +23,12 @@ class DriveHub(Node):
         self.create_subscription(CanFrame, 'can_status', self.get_can_status, 10)
 
     def create_publishers(self):
-        #self.mpc_input_publisher = self.create_publisher(MpcInput, 'mpc_input', 10)
+        self.mpc_input_publisher = self.create_publisher(MpcInput, 'mpc_input', 10)
         self.steer_publisher = self.create_publisher(Twist, 'skid_vel_cmd', 10)
 
     def cmd_vel_callback(self, msg: Twist):
-        self.mpc_cmd_vel = msg
-        self.get_logger().info(f'Received command velocity: {msg}')
+        self.get_logger().info(f'Received and published command velocity: {msg}')
+        self.steer_publisher.publish(msg)
 
     def imu_callback(self, msg: Imu):
         self.mpc_imu = msg

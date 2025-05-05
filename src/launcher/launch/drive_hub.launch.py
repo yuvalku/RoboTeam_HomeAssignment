@@ -8,23 +8,15 @@ def generate_launch_description():
     drive_hub_node = Node(
         package='drive_hub',
         name='drive_hub_node',
-        executable='drive_hub_node',
-        emulate_tty=True,
-        output={ 
-                'stdout': 'screen',
-                'stderr': 'screen',
-        }
+        executable='drive_hub',
+        output={'both': 'log'},
     )
 
     skid_steer = Node(
         package='drive_hub',
         name='skid_steer_node',
         executable='skid_steer_node',
-        emulate_tty=True,
-        output={ 
-                'stdout': 'screen',
-                'stderr': 'screen',
-        }
+        output={'both': 'log'},
     )
     
     input_vel_tester = Node(
@@ -32,17 +24,20 @@ def generate_launch_description():
         name='cmd_vel_sim_node',
         executable='cmd_vel_sim_node',
         emulate_tty=True,
-        output={ 
-                'stdout': 'screen',
-                'stderr': 'screen',
-        }
+        output={'both': 'log'},
+    )
+
+    ros2can = Node(
+        package='ros2can',
+        name='ros2can_node',
+        executable='ros2can_node',
+        output={'both': 'log'},
     )
 
     imu_tester = Node(
         package='tester',
         name='imu_sim_node',
         executable='imu_sim_node',
-        emulate_tty=True,
         output={ 
                 'stdout': 'screen',
                 'stderr': 'screen',
@@ -61,8 +56,10 @@ def generate_launch_description():
     )
     
     ld.add_action(drive_hub_node)
+    ld.add_action(skid_steer)
+    ld.add_action(ros2can)
     #ld.add_action(skid_steer)
-    ld.add_action(imu_tester)
-    ld.add_action(mpc_tester)
+    #ld.add_action(imu_tester)
+    #ld.add_action(mpc_tester)
 
     return ld
