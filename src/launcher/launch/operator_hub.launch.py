@@ -8,6 +8,8 @@ def generate_launch_description():
     remote_controller = Node(
         package='operators_hub',
         name='ps_controller_node',
+        parameters=[{
+            'camera_name': 'ROOK_1171'}],
         executable='ps_controller_node',
         emulate_tty=True,
         output={ 
