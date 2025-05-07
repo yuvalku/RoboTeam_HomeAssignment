@@ -10,6 +10,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy, QoSHistoryPolicy
 from interfaces.msg import Image420
+from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String, Header
 from cv_bridge import CvBridge
 from gi.repository import GLib
@@ -43,7 +44,7 @@ class VideoHub(Node):
         )
         
         # Publishers and Subscribers
-        self.image_pub = self.create_publisher(Image420, 'video_frames', qos_video_profile)
+        self.image_pub = self.create_publisher(CompressedImage, 'video_frames', qos_video_profile)
         self.camera_ip_sub = self.create_subscription(String, 'camera_ip_change', self.update_camera_ip, 10) 
 
         # Service client for fetching the initial camera IP
@@ -131,12 +132,9 @@ class VideoHub(Node):
         frame, width, height = self.pipeline.get_frame()
         
         if frame is not None:
-            msg = Image420()
+            msg = CompressedImage()
             msg.header = Header()
             msg.header.stamp = self.get_clock().now().to_msg()
-            msg.encoding = "jpeg"
-            msg.width = width
-            msg.height = height
             msg.data = frame
             if self.image_pub.get_subscription_count() > 0:
                 self.image_pub.publish(msg)
@@ -145,7 +143,7 @@ class VideoHub(Node):
                 self.get_logger().info(f"no subscribers available")
                 sleep(1)
         else:
-            self.get_logger().warning("No frame available to publish.", throttle_duration_sec=1)
+            self.get_logger().error("No frame available to publish.", throttle_duration_sec=1)
 
 def main(args=None):
     rclpy.init(args=args)

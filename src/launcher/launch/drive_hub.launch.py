@@ -19,14 +19,6 @@ def generate_launch_description():
         output={'both': 'log'},
     )
     
-    input_vel_tester = Node(
-        package='tester',
-        name='cmd_vel_sim_node',
-        executable='cmd_vel_sim_node',
-        emulate_tty=True,
-        output={'both': 'log'},
-    )
-
     ros2can = Node(
         package='ros2can',
         name='ros2can_node',
@@ -58,8 +50,7 @@ def generate_launch_description():
     ld.add_action(drive_hub_node)
     ld.add_action(skid_steer)
     ld.add_action(ros2can)
-    #ld.add_action(skid_steer)
-    #ld.add_action(imu_tester)
-    #ld.add_action(mpc_tester)
+    ld.add_action(imu_tester)
+    ld.add_action(mpc_tester)
 
     return ld
