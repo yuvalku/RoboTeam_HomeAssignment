@@ -21,10 +21,10 @@ class GStreamerPipeline:
         #  - jpegenc (with quality=70) re‑encodes as JPEG
         #  - appsink provides the frames to our callback.
         pipeline_str = (
-            f"rtspsrc location={self.source} latency=80 ! "
-            "rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! "
-            "videoscale ! video/x-raw,width=720,height=480 ! "
-            "jpegenc quality=45 ! appsink name=appsink emit-signals=true max-buffers=1 drop=true"
+            f"rtspsrc location={self.source} latency=40 ! "
+            "rtph264depay ! h264parse ! queue ! nvv4l2decoder ! "
+            "queue ! nvvidconv ! video/x-raw(memory:NVMM),width=720,height=480,format=I420 ! "
+            "nvjpegenc quality=45 ! appsink name=appsink emit-signals=true max-buffers=1 drop=true"
         )
 
         self.pipeline = Gst.parse_launch(pipeline_str)
