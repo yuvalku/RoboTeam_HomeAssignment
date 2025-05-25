@@ -121,5 +121,13 @@ cd /workspace/ROS2
 ./script/start_canbus.sh
 ```
 
+## WatchDog service:
+
+### Activate wehn needed automated activation of the service
+
+```bash
+sudo systemctl start ros2_docker_watchdog.service
+```
+
 
 
