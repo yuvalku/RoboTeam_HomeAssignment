@@ -21,7 +21,6 @@ class HealthAnalyzerNode(Node):
 
         self.get_logger().info('Health Analyzer Node started')
 
-
     
     def status_callback(self, msg: RobotStatus):
         self.status_buffer.append(msg)
@@ -40,33 +39,39 @@ class HealthAnalyzerNode(Node):
         battery = latest.battery_charge
         bit_error = (latest.left_bit_error != 0 or latest.right_bit_error != 0 or latest.battery_bit_error != 0)   
 
-        classification  = self.determine_classification(rpm_left, rpm_right, battery, bit_error)   
+        classification, reason  = self.determine_classification(rpm_left, rpm_right, battery, bit_error)   
 
         msg = String()
-        msg.data = classification
+        msg.data = f"{status}:{reason}" 
         self.pub.publish(msg)
-        self.get_logger().info(f"[health_analyzer]: {classification }")
+
+        # Log in analyzer
+        self.get_logger().info(f"[health_analyzer]: Robot status: {status} - {reason}")
 
 
 
     def determine_classification(self, rpm_left, rpm_right, battery, bit_error):
 
         if battery < 15:
-            return "CRITICAL"
+            return "CRITICAL", f"Low battery - Charge level: {battery}%"
 
         if rpm_left == 0 and rpm_right == 0:
             if self.last_critical_time is None:
                 self.last_critical_time = time()
             elif time() - self.last_critical_time > 5:
-                return "CRITICAL"
+                return "CRITICAL", "Both motors unresponsive for 6 seconds"
         else:
             self.last_critical_time = None
 
-        if 15 < battery < 25 or abs(rpm_left) > 2000 or abs(rpm_right) > 2000 or bit_error:
-            return "WARNING"
+        if 15 <= battery <= 25:
+            return "WARNING", f"Battery warning - Charge level: {battery}%"
+        if abs(rpm_left) > 2000 or abs(rpm_right) > 2000:
+            return "WARNING", f"Motor RPM out of range (L={rpm_left}, R={rpm_right})"
+        if bit_error:
+            return "WARNING", "BIT error detected"
 
-        return "HEALTHY"
-
+        # --- Healthy ---
+        return "HEALTHY", "All systems nominal"
 
 
 def main(args=None):
