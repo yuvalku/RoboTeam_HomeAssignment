@@ -1,133 +1,73 @@
-# ROS2
+# Health Monitor System (ROS 2)
 
-## Description
-
-ROS 2 infrastructure implementation for robotic platforms. This project integrates ROS 2 with CANOpenNode and includes modular, containerized nodes for control, perception, and operator interfaces.
-
----
-
-## System Architecture
-
-### Platform Side (Jetson Orin NX)
-
-This device runs two main Docker containers:
-
-* **`drive_hub`**: Handles driving, manipulation, LEDs, tilt cameras, and runs the MPC controller. It interfaces with `ros2can_bridge` for CAN bus communication. (Planned to be renamed to `operation_hub`.)
-
-* **`video_hub`**: Manages IP camera connections using GStreamer, processes frames, and publishes them on the `video_topic`. It dynamically receives the camera IP from the operator via the `ip_service`.
-
-* **`ros2can_bridge`**: Bridges ROS 2 and the CAN bus, translating ROS messages to CAN commands and vice versa. It publishes data on `status_topic`.
-
-### Operator Side
-
-* **`operator_hub`**: Provides the interface between the user (e.g., via AiCU in C#) and the ROS 2 system. It communicates using a message queue internally and ROS 2 topics externally (`operation_cmd_topic`).
+## Summary
+This project delivers a complete **ROS 2 health monitoring framework** that evaluates the robot’s operational state and classifies it as **HEALTHY**, **WARNING**, or **CRITICAL**.  
+It integrates with CAN-bus data via `ros2can` and provides automatic alerting, logging, and a retrievable health history.
 
 ---
 
-## Communication Topology
+## 🚀 Key Components
 
-* ROS 2 topics (`vel_cmd_topic`, `manip_cmd_topic`, `status_topic`, `video_topic`, `operation_cmd_topic`)
-* ROS 2 service (`ip_service`)
-* DDS for intra-ROS communication, Ethernet for inter-machine, and CAN bus for actuator/sensor interface
+### Health Analyzer Node  
+- Subscribes to `/robot_status` (`interfaces/msg/RobotStatus`)  
+- Publishes to `/health_status` (`std_msgs/String`)  
+- Evaluates robot parameters (RPMs, battery charge, and BIT flags) every 0.2 s  
 
----
+### Alert Manager Node  
+- Listens to `/health_status`  
+- Logs messages with the correct severity (`INFO`, `WARN`, `ERROR`)  
+- Prevents log flooding with a 10-second cooldown between identical alerts  
 
-## Environment Setup
+### Health History Service  
+- Stores the most recent 50 health messages in memory  
+- Offers a service `/get_health_history` (`interfaces/srv/GetHealthHistory`)  
+  for retrieving the latest *N* entries  
 
-### System Requirements
-
-* Ubuntu 22.04 or 24.04 LTS
-* Two machines: Jetson Orin NX (platform) and Ubuntu operator PC
-
-### Docker & Workspace Setup
-
-1. **Install Docker and Docker Compose** ([Docker Docs](https://docs.docker.com/engine/install/ubuntu/))
-
-2. **Clone the project on both machines**:
-
-   ```bash
-   mkdir /workspace
-   cd /workspace
-   git clone https://github.com/roboteam-software/ROS2.git
-   ```
-
-3. **Build Docker Images**
-
-   On **Jetson**:
-
-   ```bash
-   cd /workspace/ROS2
-   ./script/docker_build_drive_hub.sh
-   ./script/docker_build_video_hub.sh
-   ```
-
-   On **Operator PC**:
-
-   ```bash
-   cd /workspace/ROS2
-   ./script/docker_build_operator.sh
-   ```
-
-4. **Run Docker Containers** (in separate terminals):
-
-   On **Jetson**:
-
-   ```bash
-   ./script/docker_run_drive_hub.sh
-   ./script/docker_run_video_hub.sh
-   ```
-
-   On **Operator PC**:
-
-   ```bash
-   ./script/docker_run_operator.sh
-   ```
-
-5. **Build ROS 2 Packages (inside each container):**
-
-   **drive\_hub:**
-
-   ```bash
-   colcon build --symlink-install --packages-select drive_hub interfaces launcher ros2can tester watchdog
-   ```
-
-   **video\_hub:**
-
-   ```bash
-   colcon build --symlink-install --packages-select video_hub
-   ```
-
-   **operator\_hub:**
-
-   ```bash
-   colcon build --symlink-install --packages-select operators_hub interfaces
-   ```
-
-6. **Alternative: Use Docker Compose (Jetson only)**
-
-   ```bash
-   cd /workspace/ROS2
-   docker-compose -f docker-compose_drive_hub.yml up
-   ```
+### Launch Integration  
+- Unified launch file starts all core nodes and the CAN-bus simulation  
+- Supports adjustable parameters and clean shutdown
 
 ---
 
-## CANBUS:
+## ⚙️ Classification Logic
 
-### Activate CAN bus on the Advantech Platform
+| State | Criteria |
+|-------|-----------|
+| **HEALTHY** | RPMs within limits, battery > 25%, no BIT errors |
+| **WARNING** | 15 % ≤ battery ≤ 25 % OR RPM out of range OR BIT error |
+| **CRITICAL** | battery < 15 % OR both motors stopped > 5 s |
+
+All thresholds can be changed through ROS 2 parameters at runtime.
+
+---
+
+## 🧩 Extended Features
+
+- **Configurable Thresholds:** tune battery and RPM limits per robot type  
+- **Service API:** request recent health data via `/get_health_history`  
+- **CAN Emergency Stop Detection:** listens for specific CAN IDs (0x103, 0x104)  
+- **Real-Time Processing:** operates continuously at 5 Hz  
+
+---
+
+## 🛠️ Build and Run
 
 ```bash
-cd /workspace/ROS2
-./script/start_canbus.sh
-```
+# Build
+cd RoboTeam_HomeAssignment/
+colcon build --packages-select health_monitor
+source install/setup.bash
 
-## WatchDog service:
+# Launch the system
+ros2 launch health_monitor health_monitor.launch.py
 
-### Activate wehn needed automated activation of the service
 
+## ✅ Testing
 ```bash
-sudo systemctl start ros2_docker_watchdog.service
-```
-
-
+# Healthy state
+ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 1600, right_rpm: 1600, battery_charge: 95, left_bit_error: 0, right_bit_error: 0, battery_bit_error: 0}"
+# Warning state
+ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 2300, right_rpm: 1000, battery_charge: 20, left_bit_error: 0, right_bit_error: 0, battery_bit_error: 0}"
+# Critical state
+ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 0, right_rpm: 0, battery_charge: 10, left_bit_error: 1, right_bit_error: 0, battery_bit_error: 0}"
 
