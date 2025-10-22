@@ -58,15 +58,8 @@ source install/setup.bash
 
 # Launch the system
 ros2 launch health_monitor health_monitor.launch.py
-
-## ✅ Testing
-
-The following commands simulate different robot health states and verify that the system correctly classifies them as **HEALTHY**, **WARNING**, or **CRITICAL**.
-
-### 🟢 Healthy State  
-All systems nominal — normal RPMs, high battery charge, no BIT errors.  
-You should see `/health_status` publish **HEALTHY**.
-
+```
+## 🧪 Testing
 ```bash
 # Healthy State
 ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 1600, right_rpm: 1600, battery_charge: 95, left_bit_error: 0, right_bit_error: 0, battery_bit_error: 0}"
