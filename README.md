@@ -15,17 +15,17 @@ It integrates with CAN-bus data via `ros2can` and provides automatic alerting, l
 
 ### Alert Manager Node  
 - Listens to `/health_status`  
-- Logs messages with the correct severity (`INFO`, `WARN`, `ERROR`)  
+- Logs messages with proper severity (`INFO`, `WARN`, `ERROR`)  
 - Prevents log flooding with a 10-second cooldown between identical alerts  
 
 ### Health History Service  
 - Stores the most recent 50 health messages in memory  
-- Offers a service `/get_health_history` (`interfaces/srv/GetHealthHistory`)  
-  for retrieving the latest *N* entries  
+- Provides a service `/get_health_history` (`interfaces/srv/GetHealthHistory`)  
+  to retrieve the latest *N* entries  
 
 ### Launch Integration  
 - Unified launch file starts all core nodes and the CAN-bus simulation  
-- Supports adjustable parameters and clean shutdown
+- Supports adjustable parameters and clean shutdown  
 
 ---
 
@@ -33,25 +33,23 @@ It integrates with CAN-bus data via `ros2can` and provides automatic alerting, l
 
 | State | Criteria |
 |-------|-----------|
-| **HEALTHY** | RPMs within limits, battery > 25%, no BIT errors |
+| **HEALTHY** | RPMs within limits, battery > 25 %, no BIT errors |
 | **WARNING** | 15 % ≤ battery ≤ 25 % OR RPM out of range OR BIT error |
 | **CRITICAL** | battery < 15 % OR both motors stopped > 5 s |
 
-All thresholds can be changed through ROS 2 parameters at runtime.
+All thresholds are configurable through ROS 2 parameters at runtime.
 
 ---
 
 ## 🧩 Extended Features
-
 - **Configurable Thresholds:** tune battery and RPM limits per robot type  
 - **Service API:** request recent health data via `/get_health_history`  
-- **CAN Emergency Stop Detection:** listens for specific CAN IDs (0x103, 0x104)  
-- **Real-Time Processing:** operates continuously at 5 Hz  
+- **CAN Emergency Stop Detection:** monitors CAN IDs 0x103 and 0x104  
+- **Real-Time Operation:** runs continuously at 5 Hz  
 
 ---
 
 ## 🛠️ Build and Run
-
 ```bash
 # Build
 cd RoboTeam_HomeAssignment/
@@ -60,14 +58,3 @@ source install/setup.bash
 
 # Launch the system
 ros2 launch health_monitor health_monitor.launch.py
-
-
-## ✅ Testing
-```bash
-# Healthy state
-ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 1600, right_rpm: 1600, battery_charge: 95, left_bit_error: 0, right_bit_error: 0, battery_bit_error: 0}"
-# Warning state
-ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 2300, right_rpm: 1000, battery_charge: 20, left_bit_error: 0, right_bit_error: 0, battery_bit_error: 0}"
-# Critical state
-ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 0, right_rpm: 0, battery_charge: 10, left_bit_error: 1, right_bit_error: 0, battery_bit_error: 0}"
-
