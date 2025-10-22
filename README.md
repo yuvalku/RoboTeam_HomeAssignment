@@ -53,7 +53,7 @@ All thresholds are configurable through ROS 2 parameters at runtime.
 ```bash
 # Build
 cd RoboTeam_HomeAssignment/
-colcon build --packages-select health_monitor
+colcon build --packages-select interfaces ros2can health_monitor
 source install/setup.bash
 
 # Launch the system
@@ -62,6 +62,7 @@ ros2 launch health_monitor health_monitor.launch.py
 ## 🧪 Testing
 ```bash
 # Healthy State
+ros2 topic echo /health_status
 ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 1600, right_rpm: 1600, battery_charge: 95, left_bit_error: 0, right_bit_error: 0, battery_bit_error: 0}"
 
 # Warning State
@@ -70,3 +71,5 @@ ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 2300, rig
 # Critial State
 ros2 topic pub -1 /robot_status interfaces/msg/RobotStatus "{left_rpm: 0, right_rpm: 0, battery_charge: 10, left_bit_error: 1, right_bit_error: 0, battery_bit_error: 0}"
 
+# Get health history
+ros2 service call /get_health_history interfaces/srv/GetHealthHistory "{count: 10}"
