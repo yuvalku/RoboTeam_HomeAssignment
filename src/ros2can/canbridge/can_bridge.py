@@ -10,7 +10,10 @@ class CanBridge:
     def __init__(self):
         self._load_settings()
         self.robot_config = get_robot_conf(self.robot_name)
-        self.bus = can.Bus(channel='can0', bustype='socketcan', bitrate=500000)
+        # self.bus = can.Bus(channel='can0', bustype='socketcan', bitrate=500000)
+        import can
+        self.bus = can.Bus(bustype='virtual')
+
 
         if self.robot_name == "ROOK":
             self.can_message = rook_message.RookMessage()
@@ -75,7 +78,10 @@ class CanBridge:
 # ----------------------------------------------------------------
 # Private methods 
     def _load_settings(self):
-        settings_path = "/workspaces/ros2_workspace/src/ros2can/canbridge/settings.xml"
+        import os
+        settings_path = os.path.join(os.path.dirname(__file__), "settings.xml")
+
+        # settings_path =    "/workspaces/ros2_workspace/src/ros2can/canbridge/settings.xml"
 
         tree = ET.parse(settings_path)
         root = tree.getroot()

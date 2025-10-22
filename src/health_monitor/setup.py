@@ -10,18 +10,20 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/launch', ['launch/health_monitor.launch.py']),
     ],
-    install_requires=['setuptools', 'python-can'],
+    install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='root',
-    maintainer_email='root@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
-    tests_require=['pytest'],
+    maintainer='Yuval Kutai',
+    maintainer_email='yuvalkutai@gmail.com',
+    description='Health monitor nodes for robot diagnostics',
+    license='MIT',
+    extras_require={'test': ['pytest']},
     entry_points={
         'console_scripts': [
-            "health_analyzer_node = health_monitor.health_analyzer_node:main",
-            "alert_manager_node = health_monitor.alert_manager_node:main"
+            'health_analyzer_node = health_monitor.health_analyzer_node:main',
+            'alert_manager = health_monitor.alert_manager_node:main',
+            'health_history_service = health_monitor.health_history_service:main',
         ],
     },
 )
