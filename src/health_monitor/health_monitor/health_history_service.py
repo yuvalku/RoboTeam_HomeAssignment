@@ -3,7 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from collections import deque
-from interfaces.srv import GetHealthHistory  # custom service definition
+from interfaces.srv import GetHealthHistory 
 
 class HealthHistoryService(Node):
     def __init__(self):
